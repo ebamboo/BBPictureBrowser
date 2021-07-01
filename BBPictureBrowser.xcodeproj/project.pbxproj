@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D7E9758ACFC7459FBB6BCC5D /* libPods-BBPictureBrowser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C52C604841A2428911EC926 /* libPods-BBPictureBrowser.a */; };
 		DCC7E137268D974D00CB995B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DCC7E136268D974D00CB995B /* AppDelegate.m */; };
 		DCC7E142268D974E00CB995B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DCC7E141268D974E00CB995B /* Assets.xcassets */; };
 		DCC7E145268D974E00CB995B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DCC7E143268D974E00CB995B /* LaunchScreen.storyboard */; };
@@ -16,6 +17,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		378F7E183B37D3461EE073D1 /* Pods-BBPictureBrowser.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BBPictureBrowser.debug.xcconfig"; path = "Target Support Files/Pods-BBPictureBrowser/Pods-BBPictureBrowser.debug.xcconfig"; sourceTree = "<group>"; };
+		3C52C604841A2428911EC926 /* libPods-BBPictureBrowser.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BBPictureBrowser.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		89E5404E4C2D980E2022F5F6 /* Pods-BBPictureBrowser.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BBPictureBrowser.release.xcconfig"; path = "Target Support Files/Pods-BBPictureBrowser/Pods-BBPictureBrowser.release.xcconfig"; sourceTree = "<group>"; };
 		DCC7E132268D974D00CB995B /* BBPictureBrowser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BBPictureBrowser.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCC7E135268D974D00CB995B /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		DCC7E136268D974D00CB995B /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -33,17 +37,38 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D7E9758ACFC7459FBB6BCC5D /* libPods-BBPictureBrowser.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A6F47BFFD54FA94B15BEA479 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3C52C604841A2428911EC926 /* libPods-BBPictureBrowser.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C2B52D3F71A7B2BCE949ED99 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				378F7E183B37D3461EE073D1 /* Pods-BBPictureBrowser.debug.xcconfig */,
+				89E5404E4C2D980E2022F5F6 /* Pods-BBPictureBrowser.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		DCC7E129268D974D00CB995B = {
 			isa = PBXGroup;
 			children = (
 				DCC7E134268D974D00CB995B /* BBPictureBrowser */,
 				DCC7E133268D974D00CB995B /* Products */,
+				C2B52D3F71A7B2BCE949ED99 /* Pods */,
+				A6F47BFFD54FA94B15BEA479 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -78,6 +103,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = DCC7E14B268D974E00CB995B /* Build configuration list for PBXNativeTarget "BBPictureBrowser" */;
 			buildPhases = (
+				6ACF8021796E0F2B91A27D91 /* [CP] Check Pods Manifest.lock */,
 				DCC7E12E268D974D00CB995B /* Sources */,
 				DCC7E12F268D974D00CB995B /* Frameworks */,
 				DCC7E130268D974D00CB995B /* Resources */,
@@ -134,6 +160,31 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6ACF8021796E0F2B91A27D91 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-BBPictureBrowser-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		DCC7E12E268D974D00CB995B /* Sources */ = {
@@ -274,6 +325,7 @@
 		};
 		DCC7E14C268D974E00CB995B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 378F7E183B37D3461EE073D1 /* Pods-BBPictureBrowser.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -293,6 +345,7 @@
 		};
 		DCC7E14D268D974E00CB995B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 89E5404E4C2D980E2022F5F6 /* Pods-BBPictureBrowser.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
