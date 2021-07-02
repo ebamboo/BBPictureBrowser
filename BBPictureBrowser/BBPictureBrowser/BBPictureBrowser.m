@@ -1,6 +1,6 @@
 //
 //  BBPictureBrowser.m
-//  BBCommonKits
+//  BBPictureBrowser
 //
 //  Created by 征国科技 on 2021/3/29.
 //
