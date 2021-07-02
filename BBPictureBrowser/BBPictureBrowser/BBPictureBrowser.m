@@ -327,34 +327,9 @@
         [self addSubview:_bottomBar];
     }
     // 添加 self 到 supperView
+    self.frame = supperView.bounds;
     [supperView addSubview:self];
-    [self setTranslatesAutoresizingMaskIntoConstraints:NO];
-    NSLayoutConstraint *constraintT = [NSLayoutConstraint constraintWithItem:self
-                                                                   attribute:NSLayoutAttributeTop
-                                                                   relatedBy:NSLayoutRelationEqual
-                                                                      toItem:supperView
-                                                                   attribute:NSLayoutAttributeTop
-                                                                  multiplier:1.0 constant:CGFLOAT_MIN];
-    NSLayoutConstraint *constraintL = [NSLayoutConstraint constraintWithItem:self
-                                                                   attribute:NSLayoutAttributeLeft
-                                                                   relatedBy:NSLayoutRelationEqual
-                                                                      toItem:supperView
-                                                                   attribute:NSLayoutAttributeLeft
-                                                                  multiplier:1.0 constant:CGFLOAT_MIN];
-    NSLayoutConstraint *constraintB = [NSLayoutConstraint constraintWithItem:self
-                                                                   attribute:NSLayoutAttributeBottom
-                                                                   relatedBy:NSLayoutRelationEqual
-                                                                      toItem:supperView
-                                                                   attribute:NSLayoutAttributeBottom
-                                                                  multiplier:1.0 constant:CGFLOAT_MIN];
-    NSLayoutConstraint *constraintR = [NSLayoutConstraint constraintWithItem:self
-                                                                   attribute:NSLayoutAttributeRight
-                                                                   relatedBy:NSLayoutRelationEqual
-                                                                      toItem:supperView
-                                                                   attribute:NSLayoutAttributeRight
-                                                                  multiplier:1.0 constant:CGFLOAT_MIN];
-    [supperView addConstraints:@[constraintT, constraintL, constraintB, constraintR]];
-    [self layoutIfNeeded];
+    // 滑动到要下标为 index 的图片
     [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:_currentIndex inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:NO];
     if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowser:didShowPictureAtIndex:topBar:bottomBar:)]) {
         [_bb_delegate bb_pictureBrowser:self didShowPictureAtIndex:_currentIndex topBar:_topBar bottomBar:_bottomBar];
@@ -431,6 +406,8 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    // self
+    self.frame = self.superview.bounds;
     // collection view
     CGRect collectionFrame = self.bounds;
     collectionFrame.size.width += 10;

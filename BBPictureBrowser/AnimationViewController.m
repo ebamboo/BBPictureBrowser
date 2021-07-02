@@ -59,6 +59,7 @@
     BBPictureBrowser *browser = [BBPictureBrowser new];
     browser.bb_delegate = self;
     browser.bb_pictureList = pictureList;
+    // 设置显示动画
     browser.bb_animateFromView = [collectionView cellForItemAtIndexPath:indexPath];
     [browser bb_showOnView:self.view.window atIndex:indexPath.item];
 }
@@ -94,7 +95,30 @@
 #pragma mark - BBPictureBrowserDelegate
 
 - (nullable UIView *)bb_pictureBrowser:(nullable BBPictureBrowser *)browser animateToViewAtIndex:(NSInteger)index {
-    return nil;
+    // 设置返回动画
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:0];
+    NSArray <NSIndexPath *> *indexPathList = [_collectionView indexPathsForVisibleItems];
+    BOOL flag = NO; // 判断下标为 index 的图片是否正在展示
+    for (NSIndexPath *item in indexPathList) {
+        if (item.item == index) {
+            flag = YES;
+            break;
+        }
+    }
+    if (flag) {
+        return [_collectionView cellForItemAtIndexPath:indexPath];
+    } else {
+        ///
+        /// 下标为 index 的图片不在列表展示时，有两种选择
+        //
+        
+        // 1、返回 nil，没有动画效果
+        return nil;
+        // 2、滑动 collection view，使相应的 cell 居中展示，返回 cell，然后在进行关闭动画
+//        [_collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredVertically animated:NO];
+//        return [_collectionView cellForItemAtIndexPath:indexPath];
+        
+    }
 }
 
 @end
