@@ -9,6 +9,7 @@
 
 @interface BBPictureBrowserPictureModel : NSObject
 
++ (nonnull instancetype)bb_modelWithImage:(nullable UIImage *)image webImage:(nullable NSString *)url;
 @property (nonatomic, retain, nullable) UIImage *bb_image;
 @property (nonatomic, copy, nullable) NSString *bb_webImageUrl;
 

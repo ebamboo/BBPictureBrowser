@@ -23,6 +23,13 @@
 
 @implementation BBPictureBrowserPictureModel
 
++ (nonnull instancetype)bb_modelWithImage:(nullable UIImage *)image webImage:(nullable NSString *)url {
+    BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel new];
+    model.bb_image = image;
+    model.bb_webImageUrl = url;
+    return  model;
+}
+
 @end
 
 @interface BBPictureBrowserCell : UICollectionViewCell <UIScrollViewDelegate, UIGestureRecognizerDelegate>
@@ -139,7 +146,7 @@
         _failureView.contentMode = UIViewContentModeScaleAspectFit;
         _failureView.tintColor = [UIColor whiteColor];
         _failureView.bounds = CGRectMake(0, 0, 37, 37);
-        _failureView.image = [UIImage imageNamed:BBPictureBrowserFailureImageName];
+        _failureView.image = [[UIImage imageNamed:BBPictureBrowserFailureImageName] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
         [_infoView addSubview:_failureView];
         
         // =================== 添加手势 ======================
