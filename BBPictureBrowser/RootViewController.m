@@ -1,23 +1,21 @@
 //
-//  TestViewController.m
+//  RootViewController.m
 //  BBPictureBrowser
 //
-//  Created by 征国科技 on 2021/7/1.
+//  Created by 征国科技 on 2021/7/2.
 //
 
-#import "TestViewController.h"
+#import "RootViewController.h"
 
-@interface TestViewController ()
+@interface RootViewController ()
 
 @end
 
-@implementation TestViewController
+@implementation RootViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    
-    NSLog(@"测试");
 }
 
 /*
