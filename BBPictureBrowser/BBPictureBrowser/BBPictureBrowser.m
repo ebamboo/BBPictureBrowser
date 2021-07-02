@@ -279,9 +279,9 @@
 
 // 工具栏，由开发者通过协议提供
 @property (nonatomic, assign) CGFloat topBarHeight;
-@property (nonatomic, weak) UIView *topBar;
+@property (nonatomic, retain) UIView *topBar;
 @property (nonatomic, assign) CGFloat bottomBarHeight;
-@property (nonatomic, weak) UIView *bottomBar;
+@property (nonatomic, retain) UIView *bottomBar;
 
 @end
 

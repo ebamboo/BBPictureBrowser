@@ -21,6 +21,8 @@
 		DCC7E142268D974E00CB995B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DCC7E141268D974E00CB995B /* Assets.xcassets */; };
 		DCC7E145268D974E00CB995B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DCC7E143268D974E00CB995B /* LaunchScreen.storyboard */; };
 		DCC7E148268D974E00CB995B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DCC7E147268D974E00CB995B /* main.m */; };
+		EA4FEFEF268F613E0054E358 /* PictrueCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EA4FEFED268F613E0054E358 /* PictrueCollectionViewCell.m */; };
+		EA4FEFF0268F613E0054E358 /* PictrueCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA4FEFEE268F613E0054E358 /* PictrueCollectionViewCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +49,9 @@
 		DCC7E144268D974E00CB995B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DCC7E146268D974E00CB995B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DCC7E147268D974E00CB995B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		EA4FEFEC268F613E0054E358 /* PictrueCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PictrueCollectionViewCell.h; sourceTree = "<group>"; };
+		EA4FEFED268F613E0054E358 /* PictrueCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PictrueCollectionViewCell.m; sourceTree = "<group>"; };
+		EA4FEFEE268F613E0054E358 /* PictrueCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PictrueCollectionViewCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +135,9 @@
 				DCBA4091268F1901008D2941 /* AnimationViewController.h */,
 				DCBA4092268F1901008D2941 /* AnimationViewController.m */,
 				DCBA4093268F1901008D2941 /* AnimationViewController.xib */,
+				EA4FEFEC268F613E0054E358 /* PictrueCollectionViewCell.h */,
+				EA4FEFED268F613E0054E358 /* PictrueCollectionViewCell.m */,
+				EA4FEFEE268F613E0054E358 /* PictrueCollectionViewCell.xib */,
 				DCC7E141268D974E00CB995B /* Assets.xcassets */,
 				DCC7E143268D974E00CB995B /* LaunchScreen.storyboard */,
 				DCC7E146268D974E00CB995B /* Info.plist */,
@@ -196,6 +204,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DCC7E145268D974E00CB995B /* LaunchScreen.storyboard in Resources */,
+				EA4FEFF0268F613E0054E358 /* PictrueCollectionViewCell.xib in Resources */,
 				DCC7E142268D974E00CB995B /* Assets.xcassets in Resources */,
 				DCBA4083268EED88008D2941 /* RootViewController.xib in Resources */,
 				DCBA4090268F18F5008D2941 /* CustomUIViewController.xib in Resources */,
@@ -243,6 +252,7 @@
 				DCBA4094268F1901008D2941 /* AnimationViewController.m in Sources */,
 				DCBA408F268F18F5008D2941 /* CustomUIViewController.m in Sources */,
 				DCC7E148268D974E00CB995B /* main.m in Sources */,
+				EA4FEFEF268F613E0054E358 /* PictrueCollectionViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
