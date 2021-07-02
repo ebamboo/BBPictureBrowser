@@ -16,7 +16,7 @@
 #ifdef      BBPictureBrowserFailureImageName
 #undef      BBPictureBrowserFailureImageName
 #endif
-#define     BBPictureBrowserFailureImageName    @"error"
+#define     BBPictureBrowserFailureImageName    @"__bb_picture_browser_error__"
 
 #pragma mark - =======================================
 #pragma mark -
