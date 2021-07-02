@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		D7E9758ACFC7459FBB6BCC5D /* libPods-BBPictureBrowser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C52C604841A2428911EC926 /* libPods-BBPictureBrowser.a */; };
-		DCC2DD90268DA9800004A262 /* BBPictureBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = DCC2DD8E268DA9800004A262 /* BBPictureBrowser.m */; };
+		DCC2DE03268EEB060004A262 /* BBPictureBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = DCC2DE01268EEB060004A262 /* BBPictureBrowser.m */; };
 		DCC7E137268D974D00CB995B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DCC7E136268D974D00CB995B /* AppDelegate.m */; };
 		DCC7E142268D974E00CB995B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DCC7E141268D974E00CB995B /* Assets.xcassets */; };
 		DCC7E145268D974E00CB995B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DCC7E143268D974E00CB995B /* LaunchScreen.storyboard */; };
@@ -21,8 +21,8 @@
 		378F7E183B37D3461EE073D1 /* Pods-BBPictureBrowser.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BBPictureBrowser.debug.xcconfig"; path = "Target Support Files/Pods-BBPictureBrowser/Pods-BBPictureBrowser.debug.xcconfig"; sourceTree = "<group>"; };
 		3C52C604841A2428911EC926 /* libPods-BBPictureBrowser.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BBPictureBrowser.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		89E5404E4C2D980E2022F5F6 /* Pods-BBPictureBrowser.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BBPictureBrowser.release.xcconfig"; path = "Target Support Files/Pods-BBPictureBrowser/Pods-BBPictureBrowser.release.xcconfig"; sourceTree = "<group>"; };
-		DCC2DD8E268DA9800004A262 /* BBPictureBrowser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BBPictureBrowser.m; sourceTree = "<group>"; };
-		DCC2DD8F268DA9800004A262 /* BBPictureBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BBPictureBrowser.h; sourceTree = "<group>"; };
+		DCC2DE01268EEB060004A262 /* BBPictureBrowser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BBPictureBrowser.m; sourceTree = "<group>"; };
+		DCC2DE02268EEB060004A262 /* BBPictureBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BBPictureBrowser.h; sourceTree = "<group>"; };
 		DCC7E132268D974D00CB995B /* BBPictureBrowser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BBPictureBrowser.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCC7E135268D974D00CB995B /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		DCC7E136268D974D00CB995B /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -67,8 +67,8 @@
 		DCC2DD8D268DA9710004A262 /* BBPictureBrowser */ = {
 			isa = PBXGroup;
 			children = (
-				DCC2DD8F268DA9800004A262 /* BBPictureBrowser.h */,
-				DCC2DD8E268DA9800004A262 /* BBPictureBrowser.m */,
+				DCC2DE02268EEB060004A262 /* BBPictureBrowser.h */,
+				DCC2DE01268EEB060004A262 /* BBPictureBrowser.m */,
 			);
 			path = BBPictureBrowser;
 			sourceTree = "<group>";
@@ -204,7 +204,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DCC7E151268D979B00CB995B /* TestViewController.m in Sources */,
-				DCC2DD90268DA9800004A262 /* BBPictureBrowser.m in Sources */,
+				DCC2DE03268EEB060004A262 /* BBPictureBrowser.m in Sources */,
 				DCC7E137268D974D00CB995B /* AppDelegate.m in Sources */,
 				DCC7E148268D974E00CB995B /* main.m in Sources */,
 			);

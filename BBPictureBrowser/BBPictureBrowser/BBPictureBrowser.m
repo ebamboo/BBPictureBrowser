@@ -282,18 +282,6 @@
 
 #pragma mark - public method
 
-- (void)bb_show {
-    [self bb_showOnView:UIApplication.sharedApplication.keyWindow];
-}
-
-- (void)bb_showAtIndex:(NSInteger)index {
-    [self bb_showOnView:UIApplication.sharedApplication.keyWindow atIndex:index];
-}
-
-- (void)bb_showOnView:(nullable UIView *)onView {
-    [self bb_showOnView:onView atIndex:0];
-}
-
 - (void)bb_showOnView:(nullable UIView *)onView atIndex:(NSInteger)index {
     // 数据安全鉴定、设置
     if (_bb_pictureList.count == 0) {
@@ -313,20 +301,20 @@
         _currentIndex = _bb_pictureList.count - 1;
     }
     // 获取并添加工具栏
-    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowserHeightForTopBar)]) {
-        _topBarHeight = [_bb_delegate bb_pictureBrowserHeightForTopBar];
+    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowserHeightForTopBar:)]) {
+        _topBarHeight = [_bb_delegate bb_pictureBrowserHeightForTopBar:self];
     }
-    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowserViewForTopBar)]) {
-        _topBar = [_bb_delegate bb_pictureBrowserViewForTopBar];
+    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowserViewForTopBar:)]) {
+        _topBar = [_bb_delegate bb_pictureBrowserViewForTopBar:self];
     }
     if (_topBar) {
         [self addSubview:_topBar];
     }
-    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowserHeightForBottomBar)]) {
-        _bottomBarHeight = [_bb_delegate bb_pictureBrowserHeightForBottomBar];
+    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowserHeightForBottomBar:)]) {
+        _bottomBarHeight = [_bb_delegate bb_pictureBrowserHeightForBottomBar:self];
     }
-    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowserViewForBottomBar)]) {
-        _bottomBar = [_bb_delegate bb_pictureBrowserViewForBottomBar];
+    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowserViewForBottomBar:)]) {
+        _bottomBar = [_bb_delegate bb_pictureBrowserViewForBottomBar:self];
     }
     if (_bottomBar) {
         [self addSubview:_bottomBar];
@@ -361,8 +349,8 @@
     [supperView addConstraints:@[constraintT, constraintL, constraintB, constraintR]];
     [self layoutIfNeeded];
     [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:_currentIndex inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:NO];
-    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowserDidShowPictureAtIndex:)]) {
-        [_bb_delegate bb_pictureBrowserDidShowPictureAtIndex:_currentIndex];
+    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowser:didShowPictureAtIndex:topBar:bottomBar:)]) {
+        [_bb_delegate bb_pictureBrowser:self didShowPictureAtIndex:_currentIndex topBar:_topBar bottomBar:_bottomBar];
     }
     // 显示动画
     BBPictureBrowserPictureModel *picture = _bb_pictureList[_currentIndex];
@@ -395,6 +383,17 @@
         _collectionView.hidden = NO;
         _topBar.hidden = NO;
         _bottomBar.hidden = NO;
+    }
+}
+
+- (NSInteger)bb_currentIndex {
+    return _currentIndex;
+}
+
+- (void)bb_close {
+    BBPictureBrowserCell *cell = (BBPictureBrowserCell *)[_collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:_currentIndex inSection:0]];
+    if (cell.singleActionHandler) {
+        cell.singleActionHandler(nil);
     }
 }
 
@@ -466,8 +465,8 @@
     __weak typeof(self) weakSelf = self;
     cell.singleActionHandler = ^(UITapGestureRecognizer *singleTap) {
         UIView *toView = nil;
-        if (weakSelf.bb_delegate && [weakSelf.bb_delegate respondsToSelector:@selector(bb_pictureBrowserAnimateToViewAtIndex:)]) {
-            toView = [weakSelf.bb_delegate bb_pictureBrowserAnimateToViewAtIndex:indexPath.item];
+        if (weakSelf.bb_delegate && [weakSelf.bb_delegate respondsToSelector:@selector(bb_pictureBrowser:animateToViewAtIndex:)]) {
+            toView = [weakSelf.bb_delegate bb_pictureBrowser:weakSelf animateToViewAtIndex:indexPath.item];
         }
         if (toView && weakCell.imageView.image) {
             weakSelf.collectionView.hidden = YES;
@@ -494,8 +493,8 @@
     __block UIView *toView = nil;
     cell.panActionHandler = ^(UIPanGestureRecognizer *pan) { // cell 中已经保证 pan 手势发生的条件：图片有图且非缩放状态下
         if (pan.state == UIGestureRecognizerStateBegan) {
-            if (weakSelf.bb_delegate && [weakSelf.bb_delegate respondsToSelector:@selector(bb_pictureBrowserAnimateToViewAtIndex:)]) {
-                toView = [weakSelf.bb_delegate bb_pictureBrowserAnimateToViewAtIndex:indexPath.item];
+            if (weakSelf.bb_delegate && [weakSelf.bb_delegate respondsToSelector:@selector(bb_pictureBrowser:animateToViewAtIndex:)]) {
+                toView = [weakSelf.bb_delegate bb_pictureBrowser:weakSelf animateToViewAtIndex:indexPath.item];
             }
             weakSelf.collectionView.hidden = YES;
             weakSelf.topBar.hidden = YES;
@@ -510,6 +509,7 @@
             // 设置 animationView 锚点位于手势位置
             CGPoint panLacationInAnimationView = [pan locationInView:animationView];
             animationView.layer.anchorPoint = CGPointMake(panLacationInAnimationView.x / animationView.bounds.size.width, panLacationInAnimationView.y / animationView.bounds.size.height);
+            animationView.center = [pan locationInView:animationView.superview];
         } else if (pan.state == UIGestureRecognizerStateChanged) {
             CGPoint offset = [pan translationInView:weakSelf];
             // 设置当前位置相对原位置的缩放比例
@@ -519,7 +519,7 @@
             }
             animationView.bounds = CGRectMake(0, 0, animationViewOriginSize.width * scale, animationViewOriginSize.height * scale);
             animationView.center = [pan locationInView:animationView.superview];
-            weakSelf.backgroundColor = [BBPictureBrowserBackgroundColor colorWithAlphaComponent:scale - 0.2];
+            weakSelf.backgroundColor = [BBPictureBrowserBackgroundColor colorWithAlphaComponent:scale];
         } else if (   pan.state == UIGestureRecognizerStateCancelled
                    || pan.state == UIGestureRecognizerStateEnded
                    || pan.state == UIGestureRecognizerStateRecognized
@@ -557,8 +557,8 @@
     if (!decelerate) {
         CGFloat indexF = scrollView.contentOffset.x / scrollView.bounds.size.width;
         _currentIndex = (NSUInteger)(indexF + 0.5);
-        if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowserDidShowPictureAtIndex:)]) {
-            [_bb_delegate bb_pictureBrowserDidShowPictureAtIndex:_currentIndex];
+        if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowser:didShowPictureAtIndex:topBar:bottomBar:)]) {
+            [_bb_delegate bb_pictureBrowser:self didShowPictureAtIndex:_currentIndex topBar:_topBar bottomBar:_bottomBar];
         }
     }
 }
@@ -566,8 +566,8 @@
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     CGFloat indexF = scrollView.contentOffset.x / scrollView.bounds.size.width;
     _currentIndex = (NSUInteger)(indexF + 0.5);
-    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowserDidShowPictureAtIndex:)]) {
-        [_bb_delegate bb_pictureBrowserDidShowPictureAtIndex:_currentIndex];
+    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowser:didShowPictureAtIndex:topBar:bottomBar:)]) {
+        [_bb_delegate bb_pictureBrowser:self didShowPictureAtIndex:_currentIndex topBar:_topBar bottomBar:_bottomBar];
     }
 }
 
