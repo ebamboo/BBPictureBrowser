@@ -25,11 +25,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.title = @"BBPictureBrowser";
-    _sectionTitleList = @[@"简单使用", @"自定义UI", @"动画效果"];
+    _sectionTitleList = @[@"简单使用", @"自定义 UI", @"动画效果"];
     _dataSource = @[
         @[@"展示本地图片", @"展示网络图片", @"展示本地图片+网络图片"],
         @[@"自定义视图"],
-        @[@"展示时的动画效果", @"关闭时的动画效果", @"关闭时的动画效果---收缩到指定cell的子视图"]
+        @[@"动画效果"]
     ];
 }
 

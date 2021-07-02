@@ -492,7 +492,11 @@
                 [weakSelf removeFromSuperview];
             }];
         } else {
-            [weakSelf removeFromSuperview];
+            [UIView animateWithDuration:0.3 animations:^{
+                weakSelf.alpha = 0.0;
+            } completion:^(BOOL finished) {
+                [weakSelf removeFromSuperview];
+            }];
         }
     };
     __block UIImageView *animationView = nil;

@@ -1,0 +1,21 @@
+{
+  "images" : [
+    {
+      "filename" : "src=http---pic1.win4000.com-mobile-2017-12-28-5a448dcd184be.jpg&refer=http---pic1.win4000.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg.jpeg",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
