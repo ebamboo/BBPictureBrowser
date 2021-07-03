@@ -2,7 +2,7 @@
 //  main.m
 //  BBPictureBrowser
 //
-//  Created by 征国科技 on 2021/7/1.
+//  Created by ebamboo on 2021/7/1.
 //
 
 #import <UIKit/UIKit.h>

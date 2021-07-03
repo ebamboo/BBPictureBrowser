@@ -2,7 +2,7 @@
 //  AnimationViewController.m
 //  BBPictureBrowser
 //
-//  Created by 征国科技 on 2021/7/2.
+//  Created by ebamboo on 2021/7/2.
 //
 
 #import "AnimationViewController.h"

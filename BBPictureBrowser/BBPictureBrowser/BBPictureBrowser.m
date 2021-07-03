@@ -2,7 +2,7 @@
 //  BBPictureBrowser.m
 //  BBPictureBrowser
 //
-//  Created by 征国科技 on 2021/3/29.
+//  Created by ebamboo on 2021/3/29.
 //
 
 #import "BBPictureBrowser.h"
