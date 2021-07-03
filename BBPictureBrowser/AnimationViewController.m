@@ -109,12 +109,12 @@
         return [_collectionView cellForItemAtIndexPath:indexPath];
     } else {
         ///
-        /// 下标为 index 的图片不在列表展示时，有两种选择
+        /// 下标为 index 的图片不在列表展示时，有两种方案选择
         //
         
-        // 1、返回 nil，没有动画效果
+        // 方案一、返回 nil，没有动画效果
         return nil;
-        // 2、滑动 collection view，使相应的 cell 居中展示，返回 cell，然后在进行关闭动画
+        // 方案二、滑动 collection view，使相应的 cell 居中展示，返回 cell，然后在进行关闭动画
 //        [_collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredVertically animated:NO];
 //        return [_collectionView cellForItemAtIndexPath:indexPath];
         

@@ -47,15 +47,16 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     [collectionView deselectItemAtIndexPath:indexPath animated:YES];
-    BBPictureBrowser *browser = [BBPictureBrowser new];
     NSMutableArray *pictureList = [NSMutableArray array];
     for (NSString *name in _nameList) {
         BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel new];
         model.bb_image = [UIImage imageNamed:name];
         [pictureList addObject:model];
     }
-    browser.bb_pictureList = pictureList;
+    
+    BBPictureBrowser *browser = [BBPictureBrowser new];
     browser.bb_delegate = self;
+    browser.bb_pictureList = pictureList;
     [browser bb_showOnView:self.view.window atIndex:indexPath.item];
 }
 
