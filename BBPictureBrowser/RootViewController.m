@@ -90,7 +90,8 @@
                 @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/gif/02.gif",
                 @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/03.jpeg",
                 @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/gif/04.gif",
-                @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/05.jpeg"];
+                @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/05.jpeg"
+            ];
             NSMutableArray *pictureList = [NSMutableArray array];
             for (NSString *url in urlList) {
                 BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel new];
