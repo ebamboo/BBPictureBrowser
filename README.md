@@ -46,7 +46,8 @@ NSArray *urlList = @[
     @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/gif/02.gif",
     @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/03.jpeg",
     @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/gif/04.gif",
-    @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/05.jpeg"];
+    @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/05.jpeg"
+];
 NSMutableArray *pictureList = [NSMutableArray array];
 for (NSString *url in urlList) {
     BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel new];
@@ -73,6 +74,24 @@ browser.bb_pictureList = pictureList;
 [browser bb_showOnView:self.view.window atIndex:0];
 ```
 #### 自定义 UI
+* 自定义顶部视图，实现以下协议
+```
+- (CGFloat)bb_pictureBrowserHeightForTopBar:(nullable BBPictureBrowser *)browser;
+- (nullable UIView *)bb_pictureBrowserViewForTopBar:(nullable BBPictureBrowser *)browser;
+```
+* 自定义底部视图，实现以下协议
+```
+- (CGFloat)bb_pictureBrowserHeightForBottomBar:(nullable BBPictureBrowser *)browser;
+- (nullable UIView *)bb_pictureBrowserViewForBottomBar:(nullable BBPictureBrowser *)browser;
+```
 #### 动画效果
+* 开启显示时的动画
+```
+browser.bb_animateFromView = someView;
+```
+* 实现关闭时的动画，需要实现以下协议
+```
+- (nullable UIView *)bb_pictureBrowser:(nullable BBPictureBrowser *)browser animateToViewAtIndex:(NSInteger)index;
+```
 # License
 BBPictureBrowser is distributed under the MIT license. See LICENSE file for details.
