@@ -12,7 +12,8 @@
 pod 'BBPictureBrowser'
 ```
 ### Manually
-
+1. 下载 BBPictureBrowser。
+2. 添加 "BBPictureBrowser/BBPictureBrowser" 文件夹到项目中。
 # Use
 ### 简单使用
 ### 自定义 UI
