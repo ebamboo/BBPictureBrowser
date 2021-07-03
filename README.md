@@ -1,2 +1,1 @@
-# BBPictureBrowser
-iOS 开发中的图片浏览器
+![BBPictureBrowser](https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/readme/title.png)
