@@ -3,13 +3,17 @@
 一个轻量级的图片浏览器，支持本地图片和网络图片的展示，适用于 Swift 和 Objective-C。
 # Preview
 * 基本功能
-![基本功能](https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/readme/simple.gif)
+
+![基本功能](https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/readme/1.gif)
 * 图片缩放
-![图片缩放](https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/readme/scale.gif)
+
+![图片缩放](https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/readme/2.gif)
 * 自定义 UI
-![自定义 UI](https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/readme/customUI.gif)
+
+![自定义 UI](https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/readme/3.gif)
 * 动画效果
-![动画效果](https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/readme/animation.gif)
+
+![动画效果](https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/readme/4.gif)
 # Installation
 #### Requirements
 * Xcode 8 or higher
