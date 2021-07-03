@@ -2,7 +2,7 @@
 //  PictrueCollectionViewCell.m
 //  BBPictureBrowser
 //
-//  Created by 姚旭 on 2021/7/2.
+//  Created by ebamboo on 2021/7/2.
 //
 
 #import "PictrueCollectionViewCell.h"
