@@ -9,7 +9,7 @@
 * ARC
 ### Cocoapods
 ```
-pod 'TYCyclePagerView'
+pod 'BBPictureBrowser'
 ```
 ### Manually
 
