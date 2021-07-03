@@ -2,6 +2,14 @@
 # BBPictureBrowser
 一个轻量级的图片浏览器，支持本地图片和网络图片的展示，适用于 Swift 和 Objective-C。
 # Preview
+* 基本功能
+![基本功能](https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/readme/simple.gif)
+* 图片缩放
+![图片缩放](https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/readme/scale.gif)
+* 自定义 UI
+![自定义 UI](https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/readme/customUI.gif)
+* 动画效果
+![动画效果](https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/readme/animation.gif)
 # Installation
 #### Requirements
 * Xcode 8 or higher
