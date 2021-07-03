@@ -70,48 +70,52 @@
     if (indexPath.section == 0) {
         // ---本地图片
         if (indexPath.row == 0) {
-            BBPictureBrowser *browser = [BBPictureBrowser new];
-            NSArray *nameList = @[@"01", @"02", @"03", @"04", @"05"];
-            NSMutableArray *pictureList = [NSMutableArray array];
-            for (NSString *name in nameList) {
-                BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel new];
-                model.bb_image = [UIImage imageNamed:name];
-                [pictureList addObject:model];
-            }
-            browser.bb_pictureList = pictureList;
-            [browser bb_showOnView:self.view.window atIndex:0];
+        NSArray *nameList = @[@"01", @"02", @"03", @"04", @"05"];
+        NSMutableArray *pictureList = [NSMutableArray array];
+        for (NSString *name in nameList) {
+            BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel new];
+            model.bb_image = [UIImage imageNamed:name];
+            [pictureList addObject:model];
+        }
+        
+        BBPictureBrowser *browser = [BBPictureBrowser new];
+        browser.bb_pictureList = pictureList;
+        [browser bb_showOnView:self.view.window atIndex:0];
             return;
         }
         // ---网络图片
         if (indexPath.row == 1) {
-            BBPictureBrowser *browser = [BBPictureBrowser new];
-            NSArray *urlList = @[
-                @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/01.jpeg",
-                @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/gif/02.gif",
-                @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/03.jpeg",
-                @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/gif/04.gif",
-                @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/05.jpeg"];
-            NSMutableArray *pictureList = [NSMutableArray array];
-            for (NSString *url in urlList) {
-                BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel new];
-                model.bb_webImageUrl = url;
-                [pictureList addObject:model];
-            }
-            browser.bb_pictureList = pictureList;
-            [browser bb_showOnView:self.view.window atIndex:2];
+        NSArray *urlList = @[
+            @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/01.jpeg",
+            @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/gif/02.gif",
+            @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/03.jpeg",
+            @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/gif/04.gif",
+            @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/05.jpeg"];
+        NSMutableArray *pictureList = [NSMutableArray array];
+        for (NSString *url in urlList) {
+            BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel new];
+            model.bb_webImageUrl = url;
+            [pictureList addObject:model];
+        }
+        
+        BBPictureBrowser *browser = [BBPictureBrowser new];
+        browser.bb_pictureList = pictureList;
+        [browser bb_showOnView:self.view.window atIndex:2];
             return;
         }
         // ---本地图片+网络图片
         if (indexPath.row == 2) {
-            BBPictureBrowser *browser = [BBPictureBrowser new];
-            NSArray *pictureList = @[
-                [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/gif/01.gif"],
-                [BBPictureBrowserPictureModel bb_modelWithImage:[UIImage imageNamed:@"10"] webImage:nil],
-                [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/gif/03.gif"],
-                [BBPictureBrowserPictureModel bb_modelWithImage:[UIImage imageNamed:@"11"] webImage:nil],
-                [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/05.jpeg"]];
-            browser.bb_pictureList = pictureList;
-            [browser bb_showOnView:self.view.window atIndex:0];
+        NSArray *pictureList = @[
+            [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/gif/01.gif"],
+            [BBPictureBrowserPictureModel bb_modelWithImage:[UIImage imageNamed:@"10"] webImage:nil],
+            [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/gif/03.gif"],
+            [BBPictureBrowserPictureModel bb_modelWithImage:[UIImage imageNamed:@"11"] webImage:nil],
+            [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/05.jpeg"]
+        ];
+
+        BBPictureBrowser *browser = [BBPictureBrowser new];
+        browser.bb_pictureList = pictureList;
+        [browser bb_showOnView:self.view.window atIndex:0];
             return;
         }
     }
