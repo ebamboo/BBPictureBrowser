@@ -4,6 +4,8 @@
 //
 //  Created by ebamboo on 2021/3/29.
 //
+//  https://github.com/ebamboo/BBPictureBrowser
+//
 
 #import <UIKit/UIKit.h>
 
