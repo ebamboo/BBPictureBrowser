@@ -86,11 +86,11 @@
         // ---网络图片
         if (indexPath.row == 1) {
             NSArray *urlList = @[
-                @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/01.jpeg",
-                @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/gif/02.gif",
-                @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/03.jpeg",
-                @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/gif/04.gif",
-                @"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/05.jpeg"
+                @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/01.jpeg",
+                @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/02.gif",
+                @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/03.jpeg",
+                @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/04.gif",
+                @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/05.jpeg"
             ];
             NSMutableArray *pictureList = [NSMutableArray array];
             for (NSString *url in urlList) {
@@ -107,11 +107,11 @@
         // ---本地图片+网络图片
         if (indexPath.row == 2) {
             NSArray *pictureList = @[
-                [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/gif/01.gif"],
+                [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/01.gif"],
                 [BBPictureBrowserPictureModel bb_modelWithImage:[UIImage imageNamed:@"10"] webImage:nil],
-                [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/gif/03.gif"],
+                [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/03.gif"],
                 [BBPictureBrowserPictureModel bb_modelWithImage:[UIImage imageNamed:@"11"] webImage:nil],
-                [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/media/raw/master/BBPictureBrowser/jpeg/05.jpeg"]
+                [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/05.jpeg"]
             ];
 
             BBPictureBrowser *browser = [BBPictureBrowser new];
