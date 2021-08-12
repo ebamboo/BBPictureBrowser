@@ -34,7 +34,7 @@ import BBPictureBrowser
 ```
 * Objective-C 中在需要引用的地方
 ```
-#import <BBPictureBrowser.h>
+#import "BBPictureBrowser.h"
 ```
 #### 简单使用
 * 本地图片
