@@ -26,6 +26,51 @@ pod 'BBPictureBrowser'
 #### Manually
 1. 下载 BBPictureBrowser。
 2. 添加 "BBPictureBrowser/BBPictureBrowser" 文件夹到项目中。
+# API
+* Delegate
+```
+@class BBPictureBrowser;
+@protocol BBPictureBrowserDelegate <NSObject>
+@optional
+
+/**
+ 图片浏览器关闭时，动画缩放到的视图。如果不实现则没有关闭动画
+ */
+- (nullable UIView *)bb_pictureBrowser:(nullable BBPictureBrowser *)browser animateToViewAtIndex:(NSInteger)index;
+
+/**
+ 自定义顶部工具栏
+ */
+- (CGFloat)bb_pictureBrowserHeightForTopBar:(nullable BBPictureBrowser *)browser;
+- (nullable UIView *)bb_pictureBrowserViewForTopBar:(nullable BBPictureBrowser *)browser;
+
+/**
+ 自定义底部工具栏
+ */
+- (CGFloat)bb_pictureBrowserHeightForBottomBar:(nullable BBPictureBrowser *)browser;
+- (nullable UIView *)bb_pictureBrowserViewForBottomBar:(nullable BBPictureBrowser *)browser;
+
+/**
+ 图片浏览器展示了下标为 index 的图片
+ */
+- (void)bb_pictureBrowser:(nullable BBPictureBrowser *)browser didShowPictureAtIndex:(NSInteger)index topBar:(nullable UIView *)topBar bottomBar:(nullable UIView *)bottomBar;
+
+@end
+```
+* Class
+```
+@interface BBPictureBrowser : UIView
+
+@property (nonatomic, weak, nullable) id <BBPictureBrowserDelegate> bb_delegate;
+@property (nonatomic, retain, nonnull) NSArray <BBPictureBrowserPictureModel *> *bb_pictureList; // 数据源
+@property (nonatomic, weak, nullable) UIView *bb_animateFromView; // 展示动画开始时的视图
+
+- (void)bb_showOnView:(nullable UIView *)onView atIndex:(NSInteger)index;
+- (NSInteger)bb_currentIndex;
+- (void)bb_close;
+
+@end
+```
 # Use
 #### 导入文件
 * Swift 中在需要引用的地方 
