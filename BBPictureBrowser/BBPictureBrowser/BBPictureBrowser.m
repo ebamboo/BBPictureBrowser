@@ -274,7 +274,13 @@
 
 @interface BBPictureBrowser () <UICollectionViewDataSource, UICollectionViewDelegate>
 
+// store property
+@property (nonatomic, retain) NSArray <BBPictureBrowserPictureModel *> *pictureList;
+@property (nonatomic, weak) id <BBPictureBrowserDelegate> delegate;
+@property (nonatomic, weak) UIView *animateFromView;
 @property (nonatomic, assign) NSInteger currentIndex;
+
+// UICollectionView
 @property (nonatomic, retain) UICollectionView *collectionView;
 
 // 工具栏，由开发者通过协议提供
@@ -289,53 +295,40 @@
 
 #pragma mark - public method
 
-- (void)bb_showOnView:(nullable UIView *)onView atIndex:(NSInteger)index {
-    // 数据安全鉴定、设置
-    if (_bb_pictureList.count == 0) {
+- (void)bb_showOnView:(nonnull UIView *)onView atIndex:(NSInteger)index {
+    // 数据安全检查配置
+    if (_pictureList.count == 0) {
         return;
-    }
-    UIView *supperView = nil;
-    if (!onView) {
-        supperView = UIApplication.sharedApplication.keyWindow;
-    } else {
-        supperView = onView;
     }
     _currentIndex = index;
     if (index < 0) {
         _currentIndex = 0;
     }
-    if (index > _bb_pictureList.count - 1) {
-        _currentIndex = _bb_pictureList.count - 1;
+    if (index > _pictureList.count - 1) {
+        _currentIndex = _pictureList.count - 1;
     }
-    // 获取并添加工具栏
-    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowserHeightForTopBar:)]) {
-        _topBarHeight = [_bb_delegate bb_pictureBrowserHeightForTopBar:self];
+    // 添加 UI
+    [onView addSubview:self];
+    if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowserHeightForTopBar:)]) {
+        _topBarHeight = [_delegate bb_pictureBrowserHeightForTopBar:self];
     }
-    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowserViewForTopBar:)]) {
-        _topBar = [_bb_delegate bb_pictureBrowserViewForTopBar:self];
+    if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowserViewForTopBar:)]) {
+        _topBar = [_delegate bb_pictureBrowserViewForTopBar:self];
     }
     if (_topBar) {
         [self addSubview:_topBar];
     }
-    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowserHeightForBottomBar:)]) {
-        _bottomBarHeight = [_bb_delegate bb_pictureBrowserHeightForBottomBar:self];
+    if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowserHeightForBottomBar:)]) {
+        _bottomBarHeight = [_delegate bb_pictureBrowserHeightForBottomBar:self];
     }
-    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowserViewForBottomBar:)]) {
-        _bottomBar = [_bb_delegate bb_pictureBrowserViewForBottomBar:self];
+    if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowserViewForBottomBar:)]) {
+        _bottomBar = [_delegate bb_pictureBrowserViewForBottomBar:self];
     }
     if (_bottomBar) {
         [self addSubview:_bottomBar];
     }
-    // 添加 self 到 supperView
-    self.frame = supperView.bounds;
-    [supperView addSubview:self];
-    // 滑动到要下标为 index 的图片
-    [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:_currentIndex inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:NO];
-    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowser:didShowPictureAtIndex:topBar:bottomBar:)]) {
-        [_bb_delegate bb_pictureBrowser:self didShowPictureAtIndex:_currentIndex topBar:_topBar bottomBar:_bottomBar];
-    }
     // 显示动画
-    BBPictureBrowserPictureModel *picture = _bb_pictureList[_currentIndex];
+    BBPictureBrowserPictureModel *picture = _pictureList[_currentIndex];
     if (!picture.bb_image) {
         picture.bb_image = [SDImageCache.sharedImageCache imageFromCacheForKey:picture.bb_webImageUrl];
     }
@@ -343,11 +336,11 @@
     _collectionView.hidden = YES;
     _topBar.hidden = YES;
     _bottomBar.hidden = YES;
-    if (_bb_animateFromView && picture.bb_image) {
+    if (_animateFromView && picture.bb_image) {
         UIImageView *animationView = [[UIImageView alloc] init];
         animationView.clipsToBounds = YES;
         animationView.contentMode = UIViewContentModeScaleAspectFill;
-        animationView.frame = [_bb_animateFromView convertRect:_bb_animateFromView.bounds toView:self];
+        animationView.frame = [_animateFromView convertRect:_animateFromView.bounds toView:self];
         animationView.image = picture.bb_image;
         [self addSubview:animationView];
         __weak typeof(self) weakSelf = self;
@@ -368,10 +361,6 @@
     }
 }
 
-- (NSInteger)bb_currentIndex {
-    return _currentIndex;
-}
-
 - (void)bb_close {
     BBPictureBrowserCell *cell = (BBPictureBrowserCell *)[_collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:_currentIndex inSection:0]];
     if (cell.singleActionHandler) {
@@ -379,7 +368,25 @@
     }
 }
 
+- (NSInteger)bb_currentIndex {
+    return _currentIndex;
+}
+
+- (NSArray<BBPictureBrowserPictureModel *> *)bb_pictureList {
+    return _pictureList;
+}
+
 #pragma mark - life circle
+
++ (nonnull instancetype)bb_browserWithPictures:(nonnull NSArray<BBPictureBrowserPictureModel *> *)pictures
+                                      delegate:(nullable id<BBPictureBrowserDelegate>)delegate
+                               animateFromView:(nullable UIView *)view {
+    BBPictureBrowser *browser = [BBPictureBrowser new];
+    browser.pictureList = pictures;
+    browser.delegate = delegate;
+    browser.animateFromView = view;
+    return browser;
+}
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
@@ -439,18 +446,18 @@
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return _bb_pictureList.count;
+    return _pictureList.count;
 }
 
 - (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     BBPictureBrowserCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"BBPictureBrowserCell" forIndexPath:indexPath];
-    [cell setPicture:_bb_pictureList[indexPath.item]];
+    [cell setPicture:_pictureList[indexPath.item]];
     __weak typeof(cell) weakCell = cell;
     __weak typeof(self) weakSelf = self;
     cell.singleActionHandler = ^(UITapGestureRecognizer *singleTap) {
         UIView *toView = nil;
-        if (weakSelf.bb_delegate && [weakSelf.bb_delegate respondsToSelector:@selector(bb_pictureBrowser:animateToViewAtIndex:)]) {
-            toView = [weakSelf.bb_delegate bb_pictureBrowser:weakSelf animateToViewAtIndex:indexPath.item];
+        if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(bb_pictureBrowser:animateToViewAtIndex:)]) {
+            toView = [weakSelf.delegate bb_pictureBrowser:weakSelf animateToViewAtIndex:indexPath.item];
         }
         if (toView && weakCell.imageView.image) {
             weakSelf.collectionView.hidden = YES;
@@ -481,8 +488,8 @@
     __block UIView *toView = nil;
     cell.panActionHandler = ^(UIPanGestureRecognizer *pan) { // cell 中已经保证 pan 手势发生的条件：图片有图且非缩放状态下
         if (pan.state == UIGestureRecognizerStateBegan) {
-            if (weakSelf.bb_delegate && [weakSelf.bb_delegate respondsToSelector:@selector(bb_pictureBrowser:animateToViewAtIndex:)]) {
-                toView = [weakSelf.bb_delegate bb_pictureBrowser:weakSelf animateToViewAtIndex:indexPath.item];
+            if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(bb_pictureBrowser:animateToViewAtIndex:)]) {
+                toView = [weakSelf.delegate bb_pictureBrowser:weakSelf animateToViewAtIndex:indexPath.item];
             }
             weakSelf.collectionView.hidden = YES;
             weakSelf.topBar.hidden = YES;
@@ -545,8 +552,8 @@
     if (!decelerate) {
         CGFloat indexF = scrollView.contentOffset.x / scrollView.bounds.size.width;
         _currentIndex = (NSUInteger)(indexF + 0.5);
-        if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowser:didShowPictureAtIndex:topBar:bottomBar:)]) {
-            [_bb_delegate bb_pictureBrowser:self didShowPictureAtIndex:_currentIndex topBar:_topBar bottomBar:_bottomBar];
+        if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowser:didShowPictureAtIndex:topBar:bottomBar:)]) {
+            [_delegate bb_pictureBrowser:self didShowPictureAtIndex:_currentIndex topBar:_topBar bottomBar:_bottomBar];
         }
     }
 }
@@ -554,8 +561,8 @@
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     CGFloat indexF = scrollView.contentOffset.x / scrollView.bounds.size.width;
     _currentIndex = (NSUInteger)(indexF + 0.5);
-    if (_bb_delegate && [_bb_delegate respondsToSelector:@selector(bb_pictureBrowser:didShowPictureAtIndex:topBar:bottomBar:)]) {
-        [_bb_delegate bb_pictureBrowser:self didShowPictureAtIndex:_currentIndex topBar:_topBar bottomBar:_bottomBar];
+    if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowser:didShowPictureAtIndex:topBar:bottomBar:)]) {
+        [_delegate bb_pictureBrowser:self didShowPictureAtIndex:_currentIndex topBar:_topBar bottomBar:_bottomBar];
     }
 }
 

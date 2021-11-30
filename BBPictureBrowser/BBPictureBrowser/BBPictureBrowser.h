@@ -47,12 +47,17 @@
 
 @interface BBPictureBrowser : UIView
 
-@property (nonatomic, weak, nullable) id <BBPictureBrowserDelegate> bb_delegate;
-@property (nonatomic, retain, nonnull) NSArray <BBPictureBrowserPictureModel *> *bb_pictureList; // 数据源
-@property (nonatomic, weak, nullable) UIView *bb_animateFromView; // 展示动画开始时的视图
+// 传入需要展示的图片
+// 设置代理可以监听和相应事件以及自定义 UI 和动画
+// 显示动画开始位置视图
++ (nonnull instancetype)bb_browserWithPictures:(nonnull NSArray<BBPictureBrowserPictureModel *> *)pictures
+                                      delegate:(nullable id<BBPictureBrowserDelegate>)delegate
+                               animateFromView:(nullable UIView *)view;
 
-- (void)bb_showOnView:(nullable UIView *)onView atIndex:(NSInteger)index;
-- (NSInteger)bb_currentIndex;
+- (void)bb_showOnView:(nonnull UIView *)onView atIndex:(NSInteger)index;
 - (void)bb_close;
+
+@property (nonatomic, assign, readonly) NSInteger bb_currentIndex;
+@property (nonatomic, retain, readonly, nonnull) NSArray <BBPictureBrowserPictureModel *> *bb_pictureList;
 
 @end

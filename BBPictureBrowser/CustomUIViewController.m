@@ -54,17 +54,15 @@
         [pictureList addObject:model];
     }
     
-    BBPictureBrowser *browser = [BBPictureBrowser new];
-    browser.bb_delegate = self;
-    browser.bb_pictureList = pictureList;
+    BBPictureBrowser *browser = [BBPictureBrowser bb_browserWithPictures:pictureList delegate:self animateFromView:nil];
     [browser bb_showOnView:self.view.window atIndex:indexPath.item];
 }
 
 #pragma mark - collection view flow layout
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    CGFloat screenW = [UIScreen mainScreen].bounds.size.width;
-    CGFloat w = (screenW - 20) / 3;
+    CGFloat width = collectionView.bounds.size.width;
+    CGFloat w = (width - 20) / 3;
     return CGSizeMake(w, w);
 }
 

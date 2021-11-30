@@ -78,8 +78,7 @@
                 [pictureList addObject:model];
             }
             
-            BBPictureBrowser *browser = [BBPictureBrowser new];
-            browser.bb_pictureList = pictureList;
+            BBPictureBrowser *browser = [BBPictureBrowser bb_browserWithPictures:pictureList delegate:nil animateFromView:nil];
             [browser bb_showOnView:self.view.window atIndex:0];
             return;
         }
@@ -99,8 +98,7 @@
                 [pictureList addObject:model];
             }
             
-            BBPictureBrowser *browser = [BBPictureBrowser new];
-            browser.bb_pictureList = pictureList;
+            BBPictureBrowser *browser = [BBPictureBrowser bb_browserWithPictures:pictureList delegate:nil animateFromView:nil];
             [browser bb_showOnView:self.view.window atIndex:2];
             return;
         }
@@ -114,8 +112,7 @@
                 [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/05.jpeg"]
             ];
 
-            BBPictureBrowser *browser = [BBPictureBrowser new];
-            browser.bb_pictureList = pictureList;
+            BBPictureBrowser *browser = [BBPictureBrowser bb_browserWithPictures:pictureList delegate:nil animateFromView:nil];
             [browser bb_showOnView:self.view.window atIndex:0];
             return;
         }
