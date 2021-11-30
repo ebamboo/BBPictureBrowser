@@ -55,8 +55,7 @@
     [collectionView deselectItemAtIndexPath:indexPath animated:YES];
     NSMutableArray *pictureList = [NSMutableArray array];
     for (NSString *name in _nameList) {
-        BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel new];
-        model.bb_image = [UIImage imageNamed:name];
+        BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel bb_modelWithImage:[UIImage imageNamed:name] webImage:nil];
         [pictureList addObject:model];
     }
     

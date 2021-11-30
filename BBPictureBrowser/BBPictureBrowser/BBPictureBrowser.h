@@ -12,8 +12,11 @@
 @interface BBPictureBrowserPictureModel : NSObject
 
 + (nonnull instancetype)bb_modelWithImage:(nullable UIImage *)image webImage:(nullable NSString *)url;
-@property (nonatomic, retain, nullable) UIImage *bb_image;
-@property (nonatomic, copy, nullable) NSString *bb_webImageUrl;
+
+@property (nonatomic, retain, readonly, nullable) UIImage *bb_image;
+@property (nonatomic, copy, readonly, nullable) NSString *bb_webImageUrl;
+// 无论以 image 还是 URL 方式提供图片，最终都会回去以缩略图进行展示
+@property (nonatomic, retain, readonly, nullable) UIImage *bb_thumb;
 
 @end
 

@@ -21,13 +21,41 @@
 #pragma mark - =======================================
 #pragma mark -
 
+@interface BBPictureBrowserPictureModel ()
+
+@property (nonatomic, retain) UIImage *image;
+@property (nonatomic, copy) NSString *webImageUrl;
+@property (nonatomic, retain) UIImage *thumb;
+
+// image 获取 thumb 任务
+@property (nonatomic, retain) NSOperation *operation;
+
+@end
+
 @implementation BBPictureBrowserPictureModel
 
 + (nonnull instancetype)bb_modelWithImage:(nullable UIImage *)image webImage:(nullable NSString *)url {
     BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel new];
-    model.bb_image = image;
-    model.bb_webImageUrl = url;
+    model.image = image;
+    model.webImageUrl = url;
     return  model;
+}
+
+- (void)setImage:(UIImage *)image {
+    _image = image;
+    // 获取 thumb
+}
+
+- (UIImage *)bb_image {
+    return _image;
+}
+
+- (NSString *)bb_webImageUrl {
+    return _webImageUrl;
+}
+
+- (UIImage *)bb_thumb {
+    return _thumb;
 }
 
 @end
@@ -59,17 +87,17 @@
     __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{ // 动图需要在主线程才会有效果
         //-------
-        if (picture.bb_image) {
+        if (picture.image) {
             [self setCellStatus:0];
-            weakSelf.imageView.image = picture.bb_image;
+            weakSelf.imageView.image = picture.image;
             [weakSelf setupScrollViewContentSizeAndImageViewFrame];
         } else {
             [self setCellStatus:1];
-            [weakSelf.imageView sd_setImageWithURL:[NSURL URLWithString:picture.bb_webImageUrl] placeholderImage:nil options:SDWebImageAvoidAutoSetImage completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+            [weakSelf.imageView sd_setImageWithURL:[NSURL URLWithString:picture.webImageUrl] placeholderImage:nil options:SDWebImageAvoidAutoSetImage completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (image) {
                         [weakSelf setCellStatus:0];
-                        picture.bb_image = image;
+                        picture.image = image;
                         weakSelf.imageView.image = image;
                         [weakSelf setupScrollViewContentSizeAndImageViewFrame];
                     } else {
@@ -307,8 +335,7 @@
     if (index > _pictureList.count - 1) {
         _currentIndex = _pictureList.count - 1;
     }
-    // 添加 UI
-    [onView addSubview:self];
+    // 添加 UI 并刷新布局
     if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowserHeightForTopBar:)]) {
         _topBarHeight = [_delegate bb_pictureBrowserHeightForTopBar:self];
     }
@@ -327,25 +354,27 @@
     if (_bottomBar) {
         [self addSubview:_bottomBar];
     }
+    [onView addSubview:self];
+    [self layoutIfNeeded];
     // 显示动画
     BBPictureBrowserPictureModel *picture = _pictureList[_currentIndex];
-    if (!picture.bb_image) {
-        picture.bb_image = [SDImageCache.sharedImageCache imageFromCacheForKey:picture.bb_webImageUrl];
+    if (!picture.image) {
+        picture.image = [SDImageCache.sharedImageCache imageFromCacheForKey:picture.webImageUrl];
     }
     self.backgroundColor = [BBPictureBrowserBackgroundColor colorWithAlphaComponent:0.0];
     _collectionView.hidden = YES;
     _topBar.hidden = YES;
     _bottomBar.hidden = YES;
-    if (_animateFromView && picture.bb_image) {
+    if (_animateFromView && picture.image) {
         UIImageView *animationView = [[UIImageView alloc] init];
         animationView.clipsToBounds = YES;
         animationView.contentMode = UIViewContentModeScaleAspectFill;
         animationView.frame = [_animateFromView convertRect:_animateFromView.bounds toView:self];
-        animationView.image = picture.bb_image;
+        animationView.image = picture.image;
         [self addSubview:animationView];
         __weak typeof(self) weakSelf = self;
         [UIView animateWithDuration:0.3 animations:^{
-            animationView.frame = [weakSelf frameForShowAnimationViewAtEndWithImage:picture.bb_image];
+            animationView.frame = [weakSelf frameForShowAnimationViewAtEndWithImage:picture.image];
             self.backgroundColor = [BBPictureBrowserBackgroundColor colorWithAlphaComponent:1.0];
         } completion:^(BOOL finished) {
             weakSelf.collectionView.hidden = NO;

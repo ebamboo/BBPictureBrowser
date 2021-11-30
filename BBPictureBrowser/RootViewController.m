@@ -73,8 +73,7 @@
             NSArray *nameList = @[@"01", @"02", @"03", @"04", @"05"];
             NSMutableArray *pictureList = [NSMutableArray array];
             for (NSString *name in nameList) {
-                BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel new];
-                model.bb_image = [UIImage imageNamed:name];
+                BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel bb_modelWithImage:[UIImage imageNamed:name] webImage:nil];
                 [pictureList addObject:model];
             }
             
@@ -93,8 +92,7 @@
             ];
             NSMutableArray *pictureList = [NSMutableArray array];
             for (NSString *url in urlList) {
-                BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel new];
-                model.bb_webImageUrl = url;
+                BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:url];
                 [pictureList addObject:model];
             }
             
