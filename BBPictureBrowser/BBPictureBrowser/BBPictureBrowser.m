@@ -27,8 +27,8 @@
 @property (nonatomic, copy) NSString *webImageUrl;
 @property (nonatomic, retain) UIImage *thumb;
 
-// image 获取 thumb 任务
-@property (nonatomic, retain) NSOperation *operation;
+// 采样 thumb 任务
+@property (nonatomic, weak) NSBlockOperation *downsampleOperation;
 
 @end
 
@@ -41,9 +41,18 @@
     return  model;
 }
 
+// 采样 thumb 任务队列
+static NSOperationQueue *downsampleQueue;
 - (void)setImage:(UIImage *)image {
     _image = image;
     // 获取 thumb
+    if (!downsampleQueue) {
+        downsampleQueue = [NSOperationQueue new];
+    }
+    _downsampleOperation = [NSBlockOperation blockOperationWithBlock:^{
+        self.thumb = [self downsample:image];
+    }];
+    [downsampleQueue addOperation:_downsampleOperation];
 }
 
 - (UIImage *)bb_image {
@@ -56,6 +65,28 @@
 
 - (UIImage *)bb_thumb {
     return _thumb;
+}
+
+- (UIImage *)downsample:(UIImage *)image {
+    // 创建 CGImageSourceRef
+    NSData *data = UIImageJPEGRepresentation(image, 1.0);
+    NSDictionary *imageSourceOptions = @{ (__bridge id)kCGImageSourceShouldCache: @NO };
+    CGImageSourceRef imageSource = CGImageSourceCreateWithData((__bridge CFDataRef)data, (__bridge CFDictionaryRef)imageSourceOptions);
+    // 配置 downsampleOptions
+    CGFloat side = MAX(UIScreen.mainScreen.bounds.size.width, UIScreen.mainScreen.bounds.size.height);
+    CGFloat maxDimensionInPixels = side * UIScreen.mainScreen.scale;
+    NSDictionary *downsampleOptions = @{
+        (__bridge id)kCGImageSourceCreateThumbnailFromImageAlways: @YES,
+        (__bridge id)kCGImageSourceShouldCacheImmediately: @YES,
+        (__bridge id)kCGImageSourceCreateThumbnailWithTransform: @YES,
+        (__bridge id)kCGImageSourceThumbnailMaxPixelSize: @(maxDimensionInPixels)
+    };
+    // 采样取得 image
+    CGImageRef tempImageRef = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, (__bridge CFDictionaryRef)downsampleOptions);
+    UIImage *tempImage = [UIImage imageWithCGImage:tempImageRef];
+    CGImageRelease(tempImageRef);
+    CFRelease(imageSource);
+    return tempImage;
 }
 
 @end
@@ -87,17 +118,36 @@
     __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{ // 动图需要在主线程才会有效果
         //-------
-        if (picture.image) {
+        if (picture.thumb) {
             [self setCellStatus:0];
-            weakSelf.imageView.image = picture.image;
+            weakSelf.imageView.image = picture.thumb;
             [weakSelf setupScrollViewContentSizeAndImageViewFrame];
-        } else {
-            [self setCellStatus:1];
-            [weakSelf.imageView sd_setImageWithURL:[NSURL URLWithString:picture.webImageUrl] placeholderImage:nil options:SDWebImageAvoidAutoSetImage completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+            return;
+        }
+        [self setCellStatus:1]; // 没有“现成”的图片可供使用
+        if (picture.image) {
+            if (!picture.downsampleOperation.isExecuting) {
+                [picture.downsampleOperation cancel];
+                picture.thumb = [picture downsample:picture.image];
+            } else {
+                [picture.downsampleOperation waitUntilFinished];
+            }
+            [weakSelf setCellStatus:0];
+            weakSelf.imageView.image = picture.thumb;
+            [weakSelf setupScrollViewContentSizeAndImageViewFrame];
+            return;
+        }
+        if (picture.webImageUrl) {
+            [weakSelf.imageView sd_setImageWithURL:[NSURL URLWithString:picture.webImageUrl]
+                                  placeholderImage:nil
+                                           options:SDWebImageAvoidAutoSetImage
+                                           context:@{SDWebImageContextStoreCacheType: @(SDImageCacheTypeNone), SDWebImageContextImageThumbnailPixelSize: @(UIScreen.mainScreen.bounds.size)}
+                                          progress:nil
+                                         completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (image) {
                         [weakSelf setCellStatus:0];
-                        picture.image = image;
+                        picture.thumb = image;
                         weakSelf.imageView.image = image;
                         [weakSelf setupScrollViewContentSizeAndImageViewFrame];
                     } else {
@@ -105,6 +155,7 @@
                     }
                 });
             }];
+            return;
         }
         //-------
     });
@@ -273,9 +324,9 @@
     if (_imageView.image) {
         CGSize imageSize = _imageView.image.size;
         CGRect bounds = self.bounds;
-        if (imageSize.height * bounds.size.width / imageSize.width > bounds.size.height) { // 高 "大"
+        if (imageSize.height * bounds.size.width / imageSize.width > bounds.size.height) { // 图片高比较 "大"
             size = CGSizeMake(imageSize.width * bounds.size.height / imageSize.height, bounds.size.height);
-        } else { // 宽 "大"
+        } else { // 图片宽比较 "大"
             size = CGSizeMake(bounds.size.width, imageSize.height * bounds.size.width / imageSize.width);
         }
     }
@@ -602,9 +653,9 @@
     CGSize imageSize = image.size;
     CGRect bounds = self.bounds;
     CGSize size = CGSizeZero;
-    if (imageSize.height * bounds.size.width / imageSize.width > bounds.size.height) { // 高 "大"
+    if (imageSize.height * bounds.size.width / imageSize.width > bounds.size.height) { // 图片高比较 "大"
         size = CGSizeMake(imageSize.width * bounds.size.height / imageSize.height, bounds.size.height);
-    } else { // 宽 "大"
+    } else { // 图片宽比较 "大"
         size = CGSizeMake(bounds.size.width, imageSize.height * bounds.size.width / imageSize.width);
     }
     return CGRectMake(
