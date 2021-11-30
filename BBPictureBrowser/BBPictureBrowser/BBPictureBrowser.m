@@ -49,10 +49,11 @@ static NSOperationQueue *downsampleQueue;
     if (!downsampleQueue) {
         downsampleQueue = [NSOperationQueue new];
     }
-    _downsampleOperation = [NSBlockOperation blockOperationWithBlock:^{
+    NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
         self.thumb = [self downsample:image];
     }];
-    [downsampleQueue addOperation:_downsampleOperation];
+    [downsampleQueue addOperation:operation];
+    _downsampleOperation = operation;
 }
 
 - (UIImage *)bb_image {
