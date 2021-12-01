@@ -46,30 +46,20 @@ static NSOperationQueue *downsampleQueue;
 - (void)setImage:(UIImage *)image {
     _image = image;
     // 获取 thumb
-    if (!downsampleQueue) {
-        downsampleQueue = [NSOperationQueue new];
+    if (image) {
+        if (!downsampleQueue) {
+            downsampleQueue = [NSOperationQueue new];
+        }
+        NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
+            self.thumb = [self downsample:image];
+        }];
+        [downsampleQueue addOperation:operation];
+        _downsampleOperation = operation;
     }
-    NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
-        self.thumb = [self downsample:image];
-    }];
-    [downsampleQueue addOperation:operation];
-    _downsampleOperation = operation;
 }
-
-- (UIImage *)bb_image {
-    return _image;
-}
-
-- (NSString *)bb_webImageUrl {
-    return _webImageUrl;
-}
-
-- (UIImage *)bb_thumb {
-    return _thumb;
-}
-
+// 采样 thumb
 - (UIImage *)downsample:(UIImage *)image {
-    // 创建 CGImageSourceRef
+    // 创建 CGImageSourceRef  注意：image 不能为空进而导致 imageSource 为空
     NSData *data = UIImageJPEGRepresentation(image, 1.0);
     NSDictionary *imageSourceOptions = @{ (__bridge id)kCGImageSourceShouldCache: @NO };
     CGImageSourceRef imageSource = CGImageSourceCreateWithData((__bridge CFDataRef)data, (__bridge CFDictionaryRef)imageSourceOptions);
@@ -88,6 +78,18 @@ static NSOperationQueue *downsampleQueue;
     CGImageRelease(tempImageRef);
     CFRelease(imageSource);
     return tempImage;
+}
+
+- (UIImage *)bb_image {
+    return _image;
+}
+
+- (NSString *)bb_webImageUrl {
+    return _webImageUrl;
+}
+
+- (UIImage *)bb_thumb {
+    return _thumb;
 }
 
 @end
