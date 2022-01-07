@@ -58,7 +58,6 @@
         BBPictureModel *model = [BBPictureModel modelWithLocalImage:[UIImage imageNamed:name] webImage:nil];
         [pictureList addObject:model];
     }
-    
     BBPictureBrowser *browser = [BBPictureBrowser browserWithPictures:pictureList delegate:self animateFromView:[collectionView cellForItemAtIndexPath:indexPath]];
     [browser bb_openOnView:self.view.window atIndex:indexPath.item];
 }

@@ -68,39 +68,33 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     // 简单使用
     if (indexPath.section == 0) {
-        // ---本地图片
+        // --- 本地图片
         if (indexPath.row == 0) {
-            NSArray *nameList = @[@"01", @"02", @"03", @"04", @"05"];
-            NSMutableArray *pictureList = [NSMutableArray array];
-            for (NSString *name in nameList) {
-                BBPictureModel *model = [BBPictureModel modelWithLocalImage:[UIImage imageNamed:name] webImage:nil];
-                [pictureList addObject:model];
-            }
-            
+            NSArray *pictureList = @[
+                [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"01"] webImage:nil],
+                [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"02"] webImage:nil],
+                [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"03"] webImage:nil],
+                [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"04"] webImage:nil],
+                [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"05"] webImage:nil]
+            ];
             BBPictureBrowser *browser = [BBPictureBrowser browserWithPictures:pictureList delegate:nil animateFromView:nil];
             [browser bb_openOnView:self.view.window atIndex:0];
             return;
         }
-        // ---网络图片
+        // --- 网络图片
         if (indexPath.row == 1) {
-            NSArray *urlList = @[
-                @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/01.jpeg",
-                @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/02.gif",
-                @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/03.jpeg",
-                @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/04.gif",
-                @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/05.jpeg"
+            NSArray *pictureList = @[
+                [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/01.jpeg"],
+                [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/02.gif"],
+                [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/03.jpeg"],
+                [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/04.gif"],
+                [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/05.jpeg"]
             ];
-            NSMutableArray *pictureList = [NSMutableArray array];
-            for (NSString *url in urlList) {
-                BBPictureModel *model = [BBPictureModel modelWithLocalImage:nil webImage:url];
-                [pictureList addObject:model];
-            }
-            
             BBPictureBrowser *browser = [BBPictureBrowser browserWithPictures:pictureList delegate:nil animateFromView:nil];
             [browser bb_openOnView:self.view.window atIndex:2];
             return;
         }
-        // ---本地图片+网络图片
+        // --- 本地图片+网络图片
         if (indexPath.row == 2) {
             NSArray *pictureList = @[
                 [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/01.gif"],
@@ -109,18 +103,15 @@
                 [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"11"] webImage:nil],
                 [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/05.jpeg"]
             ];
-
             BBPictureBrowser *browser = [BBPictureBrowser browserWithPictures:pictureList delegate:nil animateFromView:nil];
             [browser bb_openOnView:self.view.window atIndex:0];
             return;
         }
     }
-    
     // 自定义 UI
     if (indexPath.section == 1) {
         [self.navigationController pushViewController:[CustomUIViewController new] animated:YES];
     }
-    
     // 动画效果
     if (indexPath.section == 2) {
         [self.navigationController pushViewController:[AnimationViewController new] animated:YES];

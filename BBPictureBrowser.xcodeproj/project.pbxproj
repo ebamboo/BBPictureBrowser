@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ADDBD37427880CF4008C0F9B /* BBPictureBrowser.podspec in Resources */ = {isa = PBXBuildFile; fileRef = ADDBD37327880CF4008C0F9B /* BBPictureBrowser.podspec */; };
 		D7E9758ACFC7459FBB6BCC5D /* libPods-BBPictureBrowser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C52C604841A2428911EC926 /* libPods-BBPictureBrowser.a */; };
 		DCBA4082268EED88008D2941 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DCBA4080268EED88008D2941 /* RootViewController.m */; };
 		DCBA4083268EED88008D2941 /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DCBA4081268EED88008D2941 /* RootViewController.xib */; };
@@ -29,6 +30,7 @@
 		378F7E183B37D3461EE073D1 /* Pods-BBPictureBrowser.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BBPictureBrowser.debug.xcconfig"; path = "Target Support Files/Pods-BBPictureBrowser/Pods-BBPictureBrowser.debug.xcconfig"; sourceTree = "<group>"; };
 		3C52C604841A2428911EC926 /* libPods-BBPictureBrowser.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BBPictureBrowser.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		89E5404E4C2D980E2022F5F6 /* Pods-BBPictureBrowser.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BBPictureBrowser.release.xcconfig"; path = "Target Support Files/Pods-BBPictureBrowser/Pods-BBPictureBrowser.release.xcconfig"; sourceTree = "<group>"; };
+		ADDBD37327880CF4008C0F9B /* BBPictureBrowser.podspec */ = {isa = PBXFileReference; lastKnownFileType = file; path = BBPictureBrowser.podspec; sourceTree = SOURCE_ROOT; };
 		DCBA407F268EED88008D2941 /* RootViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		DCBA4080268EED88008D2941 /* RootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
 		DCBA4081268EED88008D2941 /* RootViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RootViewController.xib; sourceTree = "<group>"; };
@@ -72,6 +74,29 @@
 				3C52C604841A2428911EC926 /* libPods-BBPictureBrowser.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		ADDBD37127880CAA008C0F9B /* Animation Test */ = {
+			isa = PBXGroup;
+			children = (
+				DCBA4091268F1901008D2941 /* AnimationViewController.h */,
+				DCBA4092268F1901008D2941 /* AnimationViewController.m */,
+				DCBA4093268F1901008D2941 /* AnimationViewController.xib */,
+				EA4FEFEC268F613E0054E358 /* PictrueCollectionViewCell.h */,
+				EA4FEFED268F613E0054E358 /* PictrueCollectionViewCell.m */,
+				EA4FEFEE268F613E0054E358 /* PictrueCollectionViewCell.xib */,
+			);
+			path = "Animation Test";
+			sourceTree = "<group>";
+		};
+		ADDBD37227880CBB008C0F9B /* Custom UI Test */ = {
+			isa = PBXGroup;
+			children = (
+				DCBA408C268F18F5008D2941 /* CustomUIViewController.h */,
+				DCBA408D268F18F5008D2941 /* CustomUIViewController.m */,
+				DCBA408E268F18F5008D2941 /* CustomUIViewController.xib */,
+			);
+			path = "Custom UI Test";
 			sourceTree = "<group>";
 		};
 		C2B52D3F71A7B2BCE949ED99 /* Pods */ = {
@@ -124,22 +149,16 @@
 			isa = PBXGroup;
 			children = (
 				DCC2DD8D268DA9710004A262 /* BBPictureBrowser */,
+				ADDBD37227880CBB008C0F9B /* Custom UI Test */,
+				ADDBD37127880CAA008C0F9B /* Animation Test */,
 				DCC7E135268D974D00CB995B /* AppDelegate.h */,
 				DCC7E136268D974D00CB995B /* AppDelegate.m */,
 				DCBA407F268EED88008D2941 /* RootViewController.h */,
 				DCBA4080268EED88008D2941 /* RootViewController.m */,
 				DCBA4081268EED88008D2941 /* RootViewController.xib */,
-				DCBA408C268F18F5008D2941 /* CustomUIViewController.h */,
-				DCBA408D268F18F5008D2941 /* CustomUIViewController.m */,
-				DCBA408E268F18F5008D2941 /* CustomUIViewController.xib */,
-				DCBA4091268F1901008D2941 /* AnimationViewController.h */,
-				DCBA4092268F1901008D2941 /* AnimationViewController.m */,
-				DCBA4093268F1901008D2941 /* AnimationViewController.xib */,
-				EA4FEFEC268F613E0054E358 /* PictrueCollectionViewCell.h */,
-				EA4FEFED268F613E0054E358 /* PictrueCollectionViewCell.m */,
-				EA4FEFEE268F613E0054E358 /* PictrueCollectionViewCell.xib */,
 				DCC7E141268D974E00CB995B /* Assets.xcassets */,
 				DCC7E143268D974E00CB995B /* LaunchScreen.storyboard */,
+				ADDBD37327880CF4008C0F9B /* BBPictureBrowser.podspec */,
 				DCC7E146268D974E00CB995B /* Info.plist */,
 				DCC7E147268D974E00CB995B /* main.m */,
 			);
@@ -211,6 +230,7 @@
 				DCBA408A268F12E8008D2941 /* __bb_picture_browser_error__@2x.png in Resources */,
 				DCBA4095268F1901008D2941 /* AnimationViewController.xib in Resources */,
 				DCBA408B268F12E8008D2941 /* __bb_picture_browser_error__@3x.png in Resources */,
+				ADDBD37427880CF4008C0F9B /* BBPictureBrowser.podspec in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
