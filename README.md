@@ -4,16 +4,16 @@
 # Preview
 * 基本功能
 
-![基本功能](https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/readme/1.gif)
+![基本功能](Assets/1.gif)
 * 图片缩放
 
-![图片缩放](https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/readme/2.gif)
+![图片缩放](Assets/2.gif)
 * 自定义 UI
 
-![自定义 UI](https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/readme/3.gif)
+![自定义 UI](Assets/3.gif)
 * 动画效果
 
-![动画效果](https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/readme/4.gif)
+![动画效果](Assets/4.gif)
 # Installation
 #### Requirements
 * Xcode 8 or higher
