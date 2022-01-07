@@ -39,15 +39,15 @@ import BBPictureBrowser
 #### 简单使用
 * 本地图片+网络图片
 ```
-            NSArray *pictureList = @[
-                [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/01.gif"],
-                [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"10"] webImage:nil],
-                [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/03.gif"],
-                [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"11"] webImage:nil],
-                [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/05.jpeg"]
-            ];
-            BBPictureBrowser *browser = [BBPictureBrowser browserWithPictures:pictureList delegate:nil animateFromView:nil];
-            [browser bb_openOnView:self.view.window atIndex:0];
+NSArray *pictureList = @[
+    [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/01.gif"],
+    [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"10"] webImage:nil],
+    [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/03.gif"],
+    [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"11"] webImage:nil],
+    [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/05.jpeg"]
+];
+BBPictureBrowser *browser = [BBPictureBrowser browserWithPictures:pictureList delegate:nil animateFromView:nil];
+[browser bb_openOnView:self.view.window atIndex:0];
 ```
 #### 自定义 UI
 * 自定义顶部视图，实现以下协议
