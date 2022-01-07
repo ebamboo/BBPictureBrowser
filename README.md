@@ -61,14 +61,12 @@ BBPictureBrowser *browser = [BBPictureBrowser browserWithPictures:pictureList de
 - (nullable UIView *)bb_pictureBrowserViewForBottomBar:(nullable BBPictureBrowser *)browser;
 ```
 #### 动画效果
-* 开启动画
-初始化时传入动画开始位置视图 animateFromView
+* 打开时动画：通过以下初始化方法传入动画开始位置视图 animateFromView
 ```
 - (nonnull instancetype)initWithPictures:(nonnull NSArray<BBPictureModel *> *)pictures delegate:(nullable id<BBPictureBrowserDelegate>)delegate animateFromView:(nullable UIView *)view;
 + (nonnull instancetype)browserWithPictures:(nonnull NSArray<BBPictureModel *> *)pictures delegate:(nullable id<BBPictureBrowserDelegate>)delegate animateFromView:(nullable UIView *)view;
 ```
-* 关闭动画
-实现以下协议传入动画结束位置视图 animateToView
+* 关闭时动画：实现以下协议传入动画结束位置视图 animateToView
 ```
 - (nullable UIView *)bb_pictureBrowser:(nullable BBPictureBrowser *)browser animateToViewAtIndex:(NSInteger)index;
 ```
