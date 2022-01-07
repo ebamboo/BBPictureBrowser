@@ -9,58 +9,51 @@
 
 #import <UIKit/UIKit.h>
 
-@interface BBPictureBrowserPictureModel : NSObject
+@interface BBPictureModel : NSObject
 
-+ (nonnull instancetype)bb_modelWithImage:(nullable UIImage *)image webImage:(nullable NSString *)url;
+- (nonnull instancetype)initWithLocalImage:(nullable UIImage *)local webImage:(nullable NSString *)web;
++ (nonnull instancetype)modelWithLocalImage:(nullable UIImage *)local webImage:(nullable NSString *)web;
 
-@property (nonatomic, retain, readonly, nullable) UIImage *bb_image;
-@property (nonatomic, copy, readonly, nullable) NSString *bb_webImageUrl;
-// 无论以 image 还是 URL 方式提供图片，最终都会回去以缩略图进行展示
-@property (nonatomic, retain, readonly, nullable) UIImage *bb_thumb;
+@property (nullable, nonatomic, readonly) UIImage *bb_local;
+@property (nullable, nonatomic, readonly) NSString *bb_web;
+@property (nullable, nonatomic, readonly) UIImage *bb_thumb;
 
 @end
 
 @class BBPictureBrowser;
 @protocol BBPictureBrowserDelegate <NSObject>
 @optional
-
-/**
- 图片浏览器关闭时，动画缩放到的视图。如果不实现则没有关闭动画
- */
+/// 图片浏览器关闭动画
+/// return：图片浏览器关闭时，动画缩放到的视图
+/// 若返回 nil 则没有关闭动画
 - (nullable UIView *)bb_pictureBrowser:(nullable BBPictureBrowser *)browser animateToViewAtIndex:(NSInteger)index;
 
-/**
- 自定义顶部工具栏
- */
+/// 自定义顶部工具栏
 - (CGFloat)bb_pictureBrowserHeightForTopBar:(nullable BBPictureBrowser *)browser;
 - (nullable UIView *)bb_pictureBrowserViewForTopBar:(nullable BBPictureBrowser *)browser;
 
-/**
- 自定义底部工具栏
- */
+/// 自定义底部工具栏
 - (CGFloat)bb_pictureBrowserHeightForBottomBar:(nullable BBPictureBrowser *)browser;
 - (nullable UIView *)bb_pictureBrowserViewForBottomBar:(nullable BBPictureBrowser *)browser;
 
-/**
- 图片浏览器展示了下标为 index 的图片
- */
+/// 图片浏览器展示了下标为 index 的图片
 - (void)bb_pictureBrowser:(nullable BBPictureBrowser *)browser didShowPictureAtIndex:(NSInteger)index topBar:(nullable UIView *)topBar bottomBar:(nullable UIView *)bottomBar;
 
 @end
 
 @interface BBPictureBrowser : UIView
 
-// 传入需要展示的图片
-// 设置代理可以监听和相应事件以及自定义 UI 和动画
-// 显示动画开始位置视图
-+ (nonnull instancetype)bb_browserWithPictures:(nonnull NSArray<BBPictureBrowserPictureModel *> *)pictures
-                                      delegate:(nullable id<BBPictureBrowserDelegate>)delegate
-                               animateFromView:(nullable UIView *)view;
+/// 构造器
+/// @param pictures 要展示的图片
+/// @param delegate 设置代理可以监听和响应事件、实现自定义 UI 和关闭动画
+/// @param view 图片浏览器打开时动画开始位置视图，若为 nil 则没有打开动画
+- (nonnull instancetype)initWithPictures:(nonnull NSArray<BBPictureModel *> *)pictures delegate:(nullable id<BBPictureBrowserDelegate>)delegate animateFromView:(nullable UIView *)view;
++ (nonnull instancetype)browserWithPictures:(nonnull NSArray<BBPictureModel *> *)pictures delegate:(nullable id<BBPictureBrowserDelegate>)delegate animateFromView:(nullable UIView *)view;
 
-- (void)bb_showOnView:(nonnull UIView *)onView atIndex:(NSInteger)index;
+- (void)bb_openOnView:(nonnull UIView *)onView atIndex:(NSInteger)index;
 - (void)bb_close;
 
-@property (nonatomic, assign, readonly) NSInteger bb_currentIndex;
-@property (nonatomic, retain, readonly, nonnull) NSArray <BBPictureBrowserPictureModel *> *bb_pictureList;
+@property (nonatomic, readonly) NSInteger bb_currentIndex;
+@property (nonatomic, readonly, nonnull) NSArray <BBPictureModel *> *bb_pictureList;
 
 @end

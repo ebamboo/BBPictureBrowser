@@ -73,12 +73,12 @@
             NSArray *nameList = @[@"01", @"02", @"03", @"04", @"05"];
             NSMutableArray *pictureList = [NSMutableArray array];
             for (NSString *name in nameList) {
-                BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel bb_modelWithImage:[UIImage imageNamed:name] webImage:nil];
+                BBPictureModel *model = [BBPictureModel modelWithLocalImage:[UIImage imageNamed:name] webImage:nil];
                 [pictureList addObject:model];
             }
             
-            BBPictureBrowser *browser = [BBPictureBrowser bb_browserWithPictures:pictureList delegate:nil animateFromView:nil];
-            [browser bb_showOnView:self.view.window atIndex:0];
+            BBPictureBrowser *browser = [BBPictureBrowser browserWithPictures:pictureList delegate:nil animateFromView:nil];
+            [browser bb_openOnView:self.view.window atIndex:0];
             return;
         }
         // ---网络图片
@@ -92,26 +92,26 @@
             ];
             NSMutableArray *pictureList = [NSMutableArray array];
             for (NSString *url in urlList) {
-                BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:url];
+                BBPictureModel *model = [BBPictureModel modelWithLocalImage:nil webImage:url];
                 [pictureList addObject:model];
             }
             
-            BBPictureBrowser *browser = [BBPictureBrowser bb_browserWithPictures:pictureList delegate:nil animateFromView:nil];
-            [browser bb_showOnView:self.view.window atIndex:2];
+            BBPictureBrowser *browser = [BBPictureBrowser browserWithPictures:pictureList delegate:nil animateFromView:nil];
+            [browser bb_openOnView:self.view.window atIndex:2];
             return;
         }
         // ---本地图片+网络图片
         if (indexPath.row == 2) {
             NSArray *pictureList = @[
-                [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/01.gif"],
-                [BBPictureBrowserPictureModel bb_modelWithImage:[UIImage imageNamed:@"10"] webImage:nil],
-                [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/03.gif"],
-                [BBPictureBrowserPictureModel bb_modelWithImage:[UIImage imageNamed:@"11"] webImage:nil],
-                [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/05.jpeg"]
+                [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/01.gif"],
+                [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"10"] webImage:nil],
+                [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/03.gif"],
+                [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"11"] webImage:nil],
+                [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/05.jpeg"]
             ];
 
-            BBPictureBrowser *browser = [BBPictureBrowser bb_browserWithPictures:pictureList delegate:nil animateFromView:nil];
-            [browser bb_showOnView:self.view.window atIndex:0];
+            BBPictureBrowser *browser = [BBPictureBrowser browserWithPictures:pictureList delegate:nil animateFromView:nil];
+            [browser bb_openOnView:self.view.window atIndex:0];
             return;
         }
     }

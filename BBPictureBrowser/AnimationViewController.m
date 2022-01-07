@@ -55,12 +55,12 @@
     [collectionView deselectItemAtIndexPath:indexPath animated:YES];
     NSMutableArray *pictureList = [NSMutableArray array];
     for (NSString *name in _nameList) {
-        BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel bb_modelWithImage:[UIImage imageNamed:name] webImage:nil];
+        BBPictureModel *model = [BBPictureModel modelWithLocalImage:[UIImage imageNamed:name] webImage:nil];
         [pictureList addObject:model];
     }
     
-    BBPictureBrowser *browser = [BBPictureBrowser bb_browserWithPictures:pictureList delegate:self animateFromView:[collectionView cellForItemAtIndexPath:indexPath]];
-    [browser bb_showOnView:self.view.window atIndex:indexPath.item];
+    BBPictureBrowser *browser = [BBPictureBrowser browserWithPictures:pictureList delegate:self animateFromView:[collectionView cellForItemAtIndexPath:indexPath]];
+    [browser bb_openOnView:self.view.window atIndex:indexPath.item];
 }
 
 #pragma mark - collection view flow layout

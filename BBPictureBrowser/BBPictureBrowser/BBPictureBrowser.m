@@ -8,61 +8,61 @@
 #import "BBPictureBrowser.h"
 #import <SDWebImage/SDWebImage.h>
 
-#ifdef      BBPictureBrowserBackgroundColor
-#undef      BBPictureBrowserBackgroundColor
-#endif
-#define     BBPictureBrowserBackgroundColor     [UIColor blackColor]
-
-#ifdef      BBPictureBrowserFailureImageName
-#undef      BBPictureBrowserFailureImageName
-#endif
-#define     BBPictureBrowserFailureImageName    @"__bb_picture_browser_error__"
+#define     BBPictureBrowserBackgroundColor         [UIColor blackColor]
+#define     BBPictureBrowserFailureImageName        @"__bb_picture_browser_error__"
 
 #pragma mark - =======================================
 #pragma mark -
 
-@interface BBPictureBrowserPictureModel ()
+@interface BBPictureModel ()
 
-@property (nonatomic, retain) UIImage *image;
-@property (nonatomic, copy) NSString *webImageUrl;
-@property (nonatomic, retain) UIImage *thumb;
+@property (nonatomic, retain) UIImage *localImage;
+@property (nonatomic, copy) NSString *webImage;
+@property (nonatomic, retain) UIImage *thumbImage;
 
 // 采样 thumb 任务
 @property (nonatomic, weak) NSBlockOperation *downsampleOperation;
 
 @end
 
-@implementation BBPictureBrowserPictureModel
+@implementation BBPictureModel
 
-+ (nonnull instancetype)bb_modelWithImage:(nullable UIImage *)image webImage:(nullable NSString *)url {
-    BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel new];
-    model.image = image;
-    model.webImageUrl = url;
-    return  model;
+- (nonnull instancetype)initWithLocalImage:(nullable UIImage *)local webImage:(nullable NSString *)web {
+    self = [super init];
+    if (self) {
+        self.localImage = local;
+        self.webImage = web;
+    }
+    return self;
+}
+
++ (nonnull instancetype)modelWithLocalImage:(nullable UIImage *)local webImage:(nullable NSString *)web {
+    return [[BBPictureModel alloc] initWithLocalImage:local webImage:web];
 }
 
 // 采样 thumb 任务队列
 static NSOperationQueue *downsampleQueue;
-- (void)setImage:(UIImage *)image {
-    _image = image;
+- (void)setLocalImage:(UIImage *)localImage {
+    _localImage = localImage;
     // 获取 thumb
-    if (image) {
+    if (localImage) {
         if (!downsampleQueue) {
             downsampleQueue = [NSOperationQueue new];
         }
         NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
-            self.thumb = [self downsample:image];
+            self.thumbImage = [self downsample:localImage];
         }];
         [downsampleQueue addOperation:operation];
         _downsampleOperation = operation;
     }
 }
+
 // 采样 thumb
 - (UIImage *)downsample:(UIImage *)image {
     // 创建 CGImageSourceRef  注意：image 不能为空进而导致 imageSource 为空
     NSData *data = UIImageJPEGRepresentation(image, 1.0);
     NSDictionary *imageSourceOptions = @{ (__bridge id)kCGImageSourceShouldCache: @NO };
-    CGImageSourceRef imageSource = CGImageSourceCreateWithData((__bridge CFDataRef)data, (__bridge CFDictionaryRef)imageSourceOptions);
+    CGImageSourceRef imageSourceRef = CGImageSourceCreateWithData((__bridge CFDataRef)data, (__bridge CFDictionaryRef)imageSourceOptions);
     // 配置 downsampleOptions
     CGFloat side = MAX(UIScreen.mainScreen.bounds.size.width, UIScreen.mainScreen.bounds.size.height);
     CGFloat maxDimensionInPixels = side * UIScreen.mainScreen.scale;
@@ -73,30 +73,30 @@ static NSOperationQueue *downsampleQueue;
         (__bridge id)kCGImageSourceThumbnailMaxPixelSize: @(maxDimensionInPixels)
     };
     // 采样取得 image
-    CGImageRef tempImageRef = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, (__bridge CFDictionaryRef)downsampleOptions);
+    CGImageRef tempImageRef = CGImageSourceCreateThumbnailAtIndex(imageSourceRef, 0, (__bridge CFDictionaryRef)downsampleOptions);
     UIImage *tempImage = [UIImage imageWithCGImage:tempImageRef];
     CGImageRelease(tempImageRef);
-    CFRelease(imageSource);
+    CFRelease(imageSourceRef);
     return tempImage;
 }
 
-- (UIImage *)bb_image {
-    return _image;
+- (UIImage *)bb_local {
+    return _localImage;
 }
 
-- (NSString *)bb_webImageUrl {
-    return _webImageUrl;
+- (NSString *)bb_web {
+    return _webImage;
 }
 
 - (UIImage *)bb_thumb {
-    return _thumb;
+    return _thumbImage;
 }
 
 @end
 
 @interface BBPictureBrowserCell : UICollectionViewCell <UIScrollViewDelegate, UIGestureRecognizerDelegate>
 
-@property (nonatomic, retain) BBPictureBrowserPictureModel *picture;
+@property (nonatomic, retain) BBPictureModel *picture;
 //  0 - 加载图片成功 1 - 加载图片中 2 - 加载图片失败
 @property (nonatomic, assign) NSInteger cellStatus;
 
@@ -116,32 +116,33 @@ static NSOperationQueue *downsampleQueue;
 
 #pragma mark - public method
 
-- (void)setPicture:(BBPictureBrowserPictureModel *)picture {
+- (void)setPicture:(BBPictureModel *)picture {
     _picture = picture;
     __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{ // 动图需要在主线程才会有效果
         //-------
-        if (picture.thumb) {
+        if (picture.thumbImage) {
             [self setCellStatus:0];
-            weakSelf.imageView.image = picture.thumb;
+            weakSelf.imageView.image = picture.thumbImage;
             [weakSelf setupScrollViewContentSizeAndImageViewFrame];
             return;
         }
-        [self setCellStatus:1]; // 没有“现成”的图片可供使用
-        if (picture.image) {
+        // 没有“现成”的图片可供使用
+        [self setCellStatus:1];
+        if (picture.localImage) {
             if (!picture.downsampleOperation.isExecuting) {
                 [picture.downsampleOperation cancel];
-                picture.thumb = [picture downsample:picture.image];
+                picture.thumbImage = [picture downsample:picture.localImage];
             } else {
                 [picture.downsampleOperation waitUntilFinished];
             }
             [weakSelf setCellStatus:0];
-            weakSelf.imageView.image = picture.thumb;
+            weakSelf.imageView.image = picture.thumbImage;
             [weakSelf setupScrollViewContentSizeAndImageViewFrame];
             return;
         }
-        if (picture.webImageUrl) {
-            [weakSelf.imageView sd_setImageWithURL:[NSURL URLWithString:picture.webImageUrl]
+        if (picture.webImage) {
+            [weakSelf.imageView sd_setImageWithURL:[NSURL URLWithString:picture.webImage]
                                   placeholderImage:nil
                                            options:SDWebImageAvoidAutoSetImage
                                            context:@{SDWebImageContextStoreCacheType: @(SDImageCacheTypeNone), SDWebImageContextImageThumbnailPixelSize: @(UIScreen.mainScreen.bounds.size)}
@@ -150,7 +151,7 @@ static NSOperationQueue *downsampleQueue;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (image) {
                         [weakSelf setCellStatus:0];
-                        picture.thumb = image;
+                        picture.thumbImage = image;
                         weakSelf.imageView.image = image;
                         [weakSelf setupScrollViewContentSizeAndImageViewFrame];
                     } else {
@@ -169,21 +170,22 @@ static NSOperationQueue *downsampleQueue;
     if (cellStatus == 0) {
         _infoView.hidden = YES;
         return;
-    }
-    if (cellStatus == 1) {
+    } else {
         _infoView.hidden = NO;
-        _loadingView.hidden = NO;
-        [_loadingView startAnimating];
-        _failureView.hidden = YES;
-        return;
+        if (cellStatus == 1) {
+            _loadingView.hidden = NO;
+            [_loadingView startAnimating];
+            _failureView.hidden = YES;
+            return;
+        }
+        if (cellStatus == 2) {
+            _loadingView.hidden = YES;
+            [_loadingView stopAnimating];
+            _failureView.hidden = NO;
+            return;
+        }
     }
-    if (cellStatus == 2) {
-        _infoView.hidden = NO;
-        _loadingView.hidden = YES;
-        [_loadingView stopAnimating];
-        _failureView.hidden = NO;
-        return;
-    }
+    
 }
 
 #pragma mark - life circle
@@ -357,7 +359,7 @@ static NSOperationQueue *downsampleQueue;
 @interface BBPictureBrowser () <UICollectionViewDataSource, UICollectionViewDelegate>
 
 // store property
-@property (nonatomic, retain) NSArray <BBPictureBrowserPictureModel *> *pictureList;
+@property (nonatomic, retain) NSArray <BBPictureModel *> *pictureList;
 @property (nonatomic, weak) id <BBPictureBrowserDelegate> delegate;
 @property (nonatomic, weak) UIView *animateFromView;
 @property (nonatomic, assign) NSInteger currentIndex;
@@ -377,7 +379,7 @@ static NSOperationQueue *downsampleQueue;
 
 #pragma mark - public method
 
-- (void)bb_showOnView:(nonnull UIView *)onView atIndex:(NSInteger)index {
+- (void)bb_openOnView:(nonnull UIView *)onView atIndex:(NSInteger)index {
     // 数据安全检查配置
     if (_pictureList.count == 0) {
         return;
@@ -411,24 +413,24 @@ static NSOperationQueue *downsampleQueue;
     [onView addSubview:self];
     [self layoutIfNeeded];
     // 显示动画
-    BBPictureBrowserPictureModel *picture = _pictureList[_currentIndex];
-    if (!picture.image) {
-        picture.image = [SDImageCache.sharedImageCache imageFromCacheForKey:picture.webImageUrl];
+    BBPictureModel *picture = _pictureList[_currentIndex];
+    if (!picture.localImage) {
+        picture.localImage = [SDImageCache.sharedImageCache imageFromCacheForKey:picture.webImage];
     }
     self.backgroundColor = [BBPictureBrowserBackgroundColor colorWithAlphaComponent:0.0];
     _collectionView.hidden = YES;
     _topBar.hidden = YES;
     _bottomBar.hidden = YES;
-    if (_animateFromView && picture.image) {
+    if (_animateFromView && picture.localImage) {
         UIImageView *animationView = [[UIImageView alloc] init];
         animationView.clipsToBounds = YES;
         animationView.contentMode = UIViewContentModeScaleAspectFill;
         animationView.frame = [_animateFromView convertRect:_animateFromView.bounds toView:self];
-        animationView.image = picture.image;
+        animationView.image = picture.localImage;
         [self addSubview:animationView];
         __weak typeof(self) weakSelf = self;
         [UIView animateWithDuration:0.3 animations:^{
-            animationView.frame = [weakSelf frameForShowAnimationViewAtEndWithImage:picture.image];
+            animationView.frame = [weakSelf frameForShowAnimationViewAtEndWithImage:picture.localImage];
             self.backgroundColor = [BBPictureBrowserBackgroundColor colorWithAlphaComponent:1.0];
         } completion:^(BOOL finished) {
             weakSelf.collectionView.hidden = NO;
@@ -455,20 +457,28 @@ static NSOperationQueue *downsampleQueue;
     return _currentIndex;
 }
 
-- (NSArray<BBPictureBrowserPictureModel *> *)bb_pictureList {
+- (NSArray<BBPictureModel *> *)bb_pictureList {
     return _pictureList;
 }
 
 #pragma mark - life circle
 
-+ (nonnull instancetype)bb_browserWithPictures:(nonnull NSArray<BBPictureBrowserPictureModel *> *)pictures
-                                      delegate:(nullable id<BBPictureBrowserDelegate>)delegate
-                               animateFromView:(nullable UIView *)view {
-    BBPictureBrowser *browser = [BBPictureBrowser new];
-    browser.pictureList = pictures;
-    browser.delegate = delegate;
-    browser.animateFromView = view;
-    return browser;
+- (nonnull instancetype)initWithPictures:(nonnull NSArray<BBPictureModel *> *)pictures
+                                delegate:(nullable id<BBPictureBrowserDelegate>)delegate
+                         animateFromView:(nullable UIView *)view {
+    self = [super init];
+    if (self) {
+        _pictureList = pictures;
+        _delegate = delegate;
+        _animateFromView = view;
+    }
+    return self;
+}
+
++ (nonnull instancetype)browserWithPictures:(nonnull NSArray<BBPictureModel *> *)pictures
+                                   delegate:(nullable id<BBPictureBrowserDelegate>)delegate
+                            animateFromView:(nullable UIView *)view {
+    return [[BBPictureBrowser alloc] initWithPictures:pictures delegate:delegate animateFromView:view];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
