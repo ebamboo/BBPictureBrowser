@@ -37,53 +37,17 @@ import BBPictureBrowser
 #import "BBPictureBrowser.h"
 ```
 #### 简单使用
-* 本地图片
-```
-NSArray *nameList = @[@"01", @"02", @"03", @"04", @"05"];
-NSMutableArray *pictureList = [NSMutableArray array];
-for (NSString *name in nameList) {
-    BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel new];
-    model.bb_image = [UIImage imageNamed:name];
-    [pictureList addObject:model];
-}
-
-BBPictureBrowser *browser = [BBPictureBrowser new];
-browser.bb_pictureList = pictureList;
-[browser bb_showOnView:self.view.window atIndex:0];
-```
-* 网络图片
-```
-NSArray *urlList = @[
-    @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/01.jpeg",
-    @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/02.gif",
-    @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/03.jpeg",
-    @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/04.gif",
-    @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/05.jpeg"
-];
-NSMutableArray *pictureList = [NSMutableArray array];
-for (NSString *url in urlList) {
-    BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel new];
-    model.bb_webImageUrl = url;
-    [pictureList addObject:model];
-}
-
-BBPictureBrowser *browser = [BBPictureBrowser new];
-browser.bb_pictureList = pictureList;
-[browser bb_showOnView:self.view.window atIndex:2];
-```
 * 本地图片+网络图片
 ```
-NSArray *pictureList = @[
-    [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/01.gif"],
-    [BBPictureBrowserPictureModel bb_modelWithImage:[UIImage imageNamed:@"10"] webImage:nil],
-    [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/03.gif"],
-    [BBPictureBrowserPictureModel bb_modelWithImage:[UIImage imageNamed:@"11"] webImage:nil],
-    [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/05.jpeg"]
-];
-
-BBPictureBrowser *browser = [BBPictureBrowser new];
-browser.bb_pictureList = pictureList;
-[browser bb_showOnView:self.view.window atIndex:0];
+            NSArray *pictureList = @[
+                [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/01.gif"],
+                [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"10"] webImage:nil],
+                [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/03.gif"],
+                [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"11"] webImage:nil],
+                [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/05.jpeg"]
+            ];
+            BBPictureBrowser *browser = [BBPictureBrowser browserWithPictures:pictureList delegate:nil animateFromView:nil];
+            [browser bb_openOnView:self.view.window atIndex:0];
 ```
 #### 自定义 UI
 * 自定义顶部视图，实现以下协议
