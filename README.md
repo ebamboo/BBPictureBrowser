@@ -26,51 +26,6 @@ pod 'BBPictureBrowser'
 #### Manually
 1. 下载 BBPictureBrowser。
 2. 添加 "BBPictureBrowser/BBPictureBrowser" 文件夹到项目中。
-# API
-* Delegate
-```
-@class BBPictureBrowser;
-@protocol BBPictureBrowserDelegate <NSObject>
-@optional
-
-/**
- 图片浏览器关闭时，动画缩放到的视图。如果不实现则没有关闭动画
- */
-- (nullable UIView *)bb_pictureBrowser:(nullable BBPictureBrowser *)browser animateToViewAtIndex:(NSInteger)index;
-
-/**
- 自定义顶部工具栏
- */
-- (CGFloat)bb_pictureBrowserHeightForTopBar:(nullable BBPictureBrowser *)browser;
-- (nullable UIView *)bb_pictureBrowserViewForTopBar:(nullable BBPictureBrowser *)browser;
-
-/**
- 自定义底部工具栏
- */
-- (CGFloat)bb_pictureBrowserHeightForBottomBar:(nullable BBPictureBrowser *)browser;
-- (nullable UIView *)bb_pictureBrowserViewForBottomBar:(nullable BBPictureBrowser *)browser;
-
-/**
- 图片浏览器展示了下标为 index 的图片
- */
-- (void)bb_pictureBrowser:(nullable BBPictureBrowser *)browser didShowPictureAtIndex:(NSInteger)index topBar:(nullable UIView *)topBar bottomBar:(nullable UIView *)bottomBar;
-
-@end
-```
-* Class
-```
-@interface BBPictureBrowser : UIView
-
-@property (nonatomic, weak, nullable) id <BBPictureBrowserDelegate> bb_delegate;
-@property (nonatomic, retain, nonnull) NSArray <BBPictureBrowserPictureModel *> *bb_pictureList; // 数据源
-@property (nonatomic, weak, nullable) UIView *bb_animateFromView; // 展示动画开始时的视图
-
-- (void)bb_showOnView:(nullable UIView *)onView atIndex:(NSInteger)index;
-- (NSInteger)bb_currentIndex;
-- (void)bb_close;
-
-@end
-```
 # Use
 #### 导入文件
 * Swift 中在需要引用的地方 
@@ -82,53 +37,17 @@ import BBPictureBrowser
 #import "BBPictureBrowser.h"
 ```
 #### 简单使用
-* 本地图片
-```
-NSArray *nameList = @[@"01", @"02", @"03", @"04", @"05"];
-NSMutableArray *pictureList = [NSMutableArray array];
-for (NSString *name in nameList) {
-    BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel new];
-    model.bb_image = [UIImage imageNamed:name];
-    [pictureList addObject:model];
-}
-
-BBPictureBrowser *browser = [BBPictureBrowser new];
-browser.bb_pictureList = pictureList;
-[browser bb_showOnView:self.view.window atIndex:0];
-```
-* 网络图片
-```
-NSArray *urlList = @[
-    @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/01.jpeg",
-    @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/02.gif",
-    @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/03.jpeg",
-    @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/04.gif",
-    @"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/05.jpeg"
-];
-NSMutableArray *pictureList = [NSMutableArray array];
-for (NSString *url in urlList) {
-    BBPictureBrowserPictureModel *model = [BBPictureBrowserPictureModel new];
-    model.bb_webImageUrl = url;
-    [pictureList addObject:model];
-}
-
-BBPictureBrowser *browser = [BBPictureBrowser new];
-browser.bb_pictureList = pictureList;
-[browser bb_showOnView:self.view.window atIndex:2];
-```
 * 本地图片+网络图片
 ```
 NSArray *pictureList = @[
-    [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/01.gif"],
-    [BBPictureBrowserPictureModel bb_modelWithImage:[UIImage imageNamed:@"10"] webImage:nil],
-    [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/03.gif"],
-    [BBPictureBrowserPictureModel bb_modelWithImage:[UIImage imageNamed:@"11"] webImage:nil],
-    [BBPictureBrowserPictureModel bb_modelWithImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/05.jpeg"]
+    [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/01.gif"],
+    [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"10"] webImage:nil],
+    [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/gif/03.gif"],
+    [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"11"] webImage:nil],
+    [BBPictureModel modelWithLocalImage:nil webImage:@"https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/jpeg/05.jpeg"]
 ];
-
-BBPictureBrowser *browser = [BBPictureBrowser new];
-browser.bb_pictureList = pictureList;
-[browser bb_showOnView:self.view.window atIndex:0];
+BBPictureBrowser *browser = [BBPictureBrowser browserWithPictures:pictureList delegate:nil animateFromView:nil];
+[browser bb_openOnView:self.view.window atIndex:0];
 ```
 #### 自定义 UI
 * 自定义顶部视图，实现以下协议
@@ -142,13 +61,57 @@ browser.bb_pictureList = pictureList;
 - (nullable UIView *)bb_pictureBrowserViewForBottomBar:(nullable BBPictureBrowser *)browser;
 ```
 #### 动画效果
-* 开启显示时的动画
+* 打开时动画：通过以下初始化方法传入动画开始位置视图 animateFromView
 ```
-browser.bb_animateFromView = someView;
+- (nonnull instancetype)initWithPictures:(nonnull NSArray<BBPictureModel *> *)pictures delegate:(nullable id<BBPictureBrowserDelegate>)delegate animateFromView:(nullable UIView *)view;
++ (nonnull instancetype)browserWithPictures:(nonnull NSArray<BBPictureModel *> *)pictures delegate:(nullable id<BBPictureBrowserDelegate>)delegate animateFromView:(nullable UIView *)view;
 ```
-* 实现关闭时的动画，需要实现以下协议
+* 关闭时动画：实现以下协议传入动画结束位置视图 animateToView
 ```
 - (nullable UIView *)bb_pictureBrowser:(nullable BBPictureBrowser *)browser animateToViewAtIndex:(NSInteger)index;
+```
+# API
+* Delegate
+```
+@class BBPictureBrowser;
+@protocol BBPictureBrowserDelegate <NSObject>
+@optional
+/// 图片浏览器关闭动画
+/// return：图片浏览器关闭时，动画缩放到的视图
+/// 若返回 nil 则没有关闭动画
+- (nullable UIView *)bb_pictureBrowser:(nullable BBPictureBrowser *)browser animateToViewAtIndex:(NSInteger)index;
+
+/// 自定义顶部工具栏
+- (CGFloat)bb_pictureBrowserHeightForTopBar:(nullable BBPictureBrowser *)browser;
+- (nullable UIView *)bb_pictureBrowserViewForTopBar:(nullable BBPictureBrowser *)browser;
+
+/// 自定义底部工具栏
+- (CGFloat)bb_pictureBrowserHeightForBottomBar:(nullable BBPictureBrowser *)browser;
+- (nullable UIView *)bb_pictureBrowserViewForBottomBar:(nullable BBPictureBrowser *)browser;
+
+/// 图片浏览器展示了下标为 index 的图片
+- (void)bb_pictureBrowser:(nullable BBPictureBrowser *)browser didShowPictureAtIndex:(NSInteger)index topBar:(nullable UIView *)topBar bottomBar:(nullable UIView *)bottomBar;
+
+@end
+```
+* Class
+```
+@interface BBPictureBrowser : UIView
+
+/// 构造器
+/// @param pictures 要展示的图片
+/// @param delegate 设置代理可以监听和响应事件、实现自定义 UI 和关闭动画
+/// @param view 图片浏览器打开时动画开始位置视图，若为 nil 则没有打开动画
+- (nonnull instancetype)initWithPictures:(nonnull NSArray<BBPictureModel *> *)pictures delegate:(nullable id<BBPictureBrowserDelegate>)delegate animateFromView:(nullable UIView *)view;
++ (nonnull instancetype)browserWithPictures:(nonnull NSArray<BBPictureModel *> *)pictures delegate:(nullable id<BBPictureBrowserDelegate>)delegate animateFromView:(nullable UIView *)view;
+
+- (void)bb_openOnView:(nonnull UIView *)onView atIndex:(NSInteger)index;
+- (void)bb_close;
+
+@property (nonatomic, readonly) NSInteger bb_currentIndex;
+@property (nonatomic, readonly, nonnull) NSArray <BBPictureModel *> *bb_pictureList;
+
+@end
 ```
 # License
 BBPictureBrowser is distributed under the MIT license. See LICENSE file for details.
