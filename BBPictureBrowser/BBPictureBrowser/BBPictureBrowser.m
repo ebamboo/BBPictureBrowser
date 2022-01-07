@@ -94,6 +94,9 @@ static NSOperationQueue *downsampleQueue;
 
 @end
 
+#pragma mark - =======================================
+#pragma mark -
+
 @interface BBPictureBrowserCell : UICollectionViewCell <UIScrollViewDelegate, UIGestureRecognizerDelegate>
 
 @property (nonatomic, retain) BBPictureModel *picture;
