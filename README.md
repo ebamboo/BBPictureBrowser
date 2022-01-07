@@ -1,4 +1,4 @@
-![BBPictureBrowser](https://gitee.com/ebamboo/Assets/raw/master/BBPictureBrowser/readme/title.png)
+![BBPictureBrowser](Assets/title.png)
 # BBPictureBrowser
 一个轻量级的图片浏览器，支持本地图片和网络图片的展示，适用于 Swift 和 Objective-C。
 # Preview
