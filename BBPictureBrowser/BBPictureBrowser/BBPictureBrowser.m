@@ -18,20 +18,21 @@
 
 @property (nonatomic, retain) UIImage *localImage;
 @property (nonatomic, copy) NSString *webImage;
-@property (nonatomic, retain) UIImage *thumbImage;
 
-// 采样 thumb 任务
-@property (nonatomic, weak) NSBlockOperation *downsampleOperation;
+// 成功采样获取的压缩图片
+@property (nonatomic, retain) UIImage *thumbImage;
 
 @end
 
 @implementation BBPictureModel
 
+#pragma mark - public method
+
 - (nonnull instancetype)initWithLocalImage:(nullable UIImage *)local webImage:(nullable NSString *)web {
     self = [super init];
     if (self) {
         self.localImage = local;
-        self.webImage = web;
+        _webImage = web;
     }
     return self;
 }
@@ -40,25 +41,44 @@
     return [[BBPictureModel alloc] initWithLocalImage:local webImage:web];
 }
 
+- (UIImage *)bb_local {
+    return _localImage;
+}
+
+- (NSString *)bb_web {
+    return _webImage;
+}
+
+- (UIImage *)bb_thumb {
+    return _thumbImage;
+}
+
+#pragma mark - private method
+
 // 采样 thumb 任务队列
 static NSOperationQueue *downsampleQueue;
++ (void)load {
+    downsampleQueue = [NSOperationQueue new];
+}
+
+// 目前有两次使用场景会试图采样获取 thumb；
+// 第一次：模型初始化时调用
+// 第二次：展示网络图片时，把本地缓存的图片赋值给 _localImage
+// 保证 localImage 有值时，只赋值一次；
+// 如果 localImage 为 nil 时，无限制。
 - (void)setLocalImage:(UIImage *)localImage {
     _localImage = localImage;
-    // 获取 thumb
     if (localImage) {
-        if (!downsampleQueue) {
-            downsampleQueue = [NSOperationQueue new];
-        }
+        __weak typeof(self) weakSelf = self;
         NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
-            self.thumbImage = [self downsample:localImage];
+            weakSelf.thumbImage = [weakSelf downsampleFor:localImage];
         }];
         [downsampleQueue addOperation:operation];
-        _downsampleOperation = operation;
     }
 }
 
-// 采样 thumb
-- (UIImage *)downsample:(UIImage *)image {
+// 采样 thumb （Apple 提供的压缩算法）
+- (UIImage *)downsampleFor:(UIImage *)image {
     // 创建 CGImageSourceRef  注意：image 不能为空进而导致 imageSource 为空
     NSData *data = UIImageJPEGRepresentation(image, 1.0);
     NSDictionary *imageSourceOptions = @{ (__bridge id)kCGImageSourceShouldCache: @NO };
@@ -78,18 +98,6 @@ static NSOperationQueue *downsampleQueue;
     CGImageRelease(tempImageRef);
     CFRelease(imageSourceRef);
     return tempImage;
-}
-
-- (UIImage *)bb_local {
-    return _localImage;
-}
-
-- (NSString *)bb_web {
-    return _webImage;
-}
-
-- (UIImage *)bb_thumb {
-    return _thumbImage;
 }
 
 @end
@@ -133,14 +141,9 @@ static NSOperationQueue *downsampleQueue;
         // 没有“现成”的图片可供使用
         [self setCellStatus:1];
         if (picture.localImage) {
-            if (!picture.downsampleOperation.isExecuting) {
-                [picture.downsampleOperation cancel];
-                picture.thumbImage = [picture downsample:picture.localImage];
-            } else {
-                [picture.downsampleOperation waitUntilFinished];
-            }
+            picture.thumbImage = [picture downsampleFor:picture.localImage];
             [weakSelf setCellStatus:0];
-            weakSelf.imageView.image = picture.thumbImage;
+            weakSelf.imageView.image = picture.thumbImage ?: picture.localImage;
             [weakSelf setupScrollViewContentSizeAndImageViewFrame];
             return;
         }
@@ -153,8 +156,8 @@ static NSOperationQueue *downsampleQueue;
                                          completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (image) {
-                        [weakSelf setCellStatus:0];
                         picture.thumbImage = image;
+                        [weakSelf setCellStatus:0];
                         weakSelf.imageView.image = image;
                         [weakSelf setupScrollViewContentSizeAndImageViewFrame];
                     } else {
@@ -446,6 +449,10 @@ static NSOperationQueue *downsampleQueue;
         _collectionView.hidden = NO;
         _topBar.hidden = NO;
         _bottomBar.hidden = NO;
+    }
+    // 展示了下标为 index 的图片回调
+    if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowser:didShowPictureAtIndex:topBar:bottomBar:)]) {
+        [_delegate bb_pictureBrowser:self didShowPictureAtIndex:_currentIndex topBar:_topBar bottomBar:_bottomBar];
     }
 }
 
