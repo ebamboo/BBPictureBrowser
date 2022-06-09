@@ -8,6 +8,7 @@
 #import "RootViewController.h"
 #import "BBPictureBrowser.h"
 #import "CustomUIViewController.h"
+#import "CustomAutoUIViewController.h"
 #import "AnimationViewController.h"
 
 @interface RootViewController ()
@@ -28,7 +29,7 @@
     _sectionTitleList = @[@"简单使用", @"自定义 UI", @"动画效果"];
     _dataSource = @[
         @[@"展示本地图片", @"展示网络图片", @"展示本地图片+网络图片"],
-        @[@"自定义视图"],
+        @[@"自定义视图", @"自定义高度自适应视图"],
         @[@"动画效果"]
     ];
 }
@@ -110,7 +111,14 @@
     }
     // 自定义 UI
     if (indexPath.section == 1) {
-        [self.navigationController pushViewController:[CustomUIViewController new] animated:YES];
+        if (indexPath.row == 0) {
+            [self.navigationController pushViewController:[CustomUIViewController new] animated:YES];
+            return;
+        }
+        if (indexPath.row == 1) {
+            [self.navigationController pushViewController:[CustomAutoUIViewController new] animated:YES];
+            return;
+        }
     }
     // 动画效果
     if (indexPath.section == 2) {

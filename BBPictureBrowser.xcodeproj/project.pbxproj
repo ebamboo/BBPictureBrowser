@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AD007A232851CBE50087B580 /* CustomAutoUIViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD007A212851CBE50087B580 /* CustomAutoUIViewController.m */; };
+		AD007A242851CBE50087B580 /* CustomAutoUIViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD007A222851CBE50087B580 /* CustomAutoUIViewController.xib */; };
+		AD007A282851D1EA0087B580 /* TestBottomToolsView.m in Sources */ = {isa = PBXBuildFile; fileRef = AD007A272851D1EA0087B580 /* TestBottomToolsView.m */; };
+		AD007A2A2851D1F40087B580 /* TestBottomToolsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD007A292851D1F40087B580 /* TestBottomToolsView.xib */; };
 		ADDBD37427880CF4008C0F9B /* BBPictureBrowser.podspec in Resources */ = {isa = PBXBuildFile; fileRef = ADDBD37327880CF4008C0F9B /* BBPictureBrowser.podspec */; };
 		D7E9758ACFC7459FBB6BCC5D /* libPods-BBPictureBrowser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C52C604841A2428911EC926 /* libPods-BBPictureBrowser.a */; };
 		DCBA4082268EED88008D2941 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DCBA4080268EED88008D2941 /* RootViewController.m */; };
@@ -30,7 +34,13 @@
 		378F7E183B37D3461EE073D1 /* Pods-BBPictureBrowser.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BBPictureBrowser.debug.xcconfig"; path = "Target Support Files/Pods-BBPictureBrowser/Pods-BBPictureBrowser.debug.xcconfig"; sourceTree = "<group>"; };
 		3C52C604841A2428911EC926 /* libPods-BBPictureBrowser.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BBPictureBrowser.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		89E5404E4C2D980E2022F5F6 /* Pods-BBPictureBrowser.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BBPictureBrowser.release.xcconfig"; path = "Target Support Files/Pods-BBPictureBrowser/Pods-BBPictureBrowser.release.xcconfig"; sourceTree = "<group>"; };
-		ADDBD37327880CF4008C0F9B /* BBPictureBrowser.podspec */ = {isa = PBXFileReference; lastKnownFileType = file; path = BBPictureBrowser.podspec; sourceTree = SOURCE_ROOT; };
+		AD007A202851CBE50087B580 /* CustomAutoUIViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomAutoUIViewController.h; sourceTree = "<group>"; };
+		AD007A212851CBE50087B580 /* CustomAutoUIViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomAutoUIViewController.m; sourceTree = "<group>"; };
+		AD007A222851CBE50087B580 /* CustomAutoUIViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomAutoUIViewController.xib; sourceTree = "<group>"; };
+		AD007A262851D1EA0087B580 /* TestBottomToolsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestBottomToolsView.h; sourceTree = "<group>"; };
+		AD007A272851D1EA0087B580 /* TestBottomToolsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestBottomToolsView.m; sourceTree = "<group>"; };
+		AD007A292851D1F40087B580 /* TestBottomToolsView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TestBottomToolsView.xib; sourceTree = "<group>"; };
+		ADDBD37327880CF4008C0F9B /* BBPictureBrowser.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = BBPictureBrowser.podspec; sourceTree = SOURCE_ROOT; };
 		DCBA407F268EED88008D2941 /* RootViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		DCBA4080268EED88008D2941 /* RootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
 		DCBA4081268EED88008D2941 /* RootViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RootViewController.xib; sourceTree = "<group>"; };
@@ -76,6 +86,16 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		AD007A252851D18D0087B580 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				AD007A262851D1EA0087B580 /* TestBottomToolsView.h */,
+				AD007A272851D1EA0087B580 /* TestBottomToolsView.m */,
+				AD007A292851D1F40087B580 /* TestBottomToolsView.xib */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		ADDBD37127880CAA008C0F9B /* Animation Test */ = {
 			isa = PBXGroup;
 			children = (
@@ -92,9 +112,13 @@
 		ADDBD37227880CBB008C0F9B /* Custom UI Test */ = {
 			isa = PBXGroup;
 			children = (
+				AD007A252851D18D0087B580 /* View */,
 				DCBA408C268F18F5008D2941 /* CustomUIViewController.h */,
 				DCBA408D268F18F5008D2941 /* CustomUIViewController.m */,
 				DCBA408E268F18F5008D2941 /* CustomUIViewController.xib */,
+				AD007A202851CBE50087B580 /* CustomAutoUIViewController.h */,
+				AD007A212851CBE50087B580 /* CustomAutoUIViewController.m */,
+				AD007A222851CBE50087B580 /* CustomAutoUIViewController.xib */,
 			);
 			path = "Custom UI Test";
 			sourceTree = "<group>";
@@ -224,9 +248,11 @@
 			files = (
 				DCC7E145268D974E00CB995B /* LaunchScreen.storyboard in Resources */,
 				EA4FEFF0268F613E0054E358 /* PictrueCollectionViewCell.xib in Resources */,
+				AD007A242851CBE50087B580 /* CustomAutoUIViewController.xib in Resources */,
 				DCC7E142268D974E00CB995B /* Assets.xcassets in Resources */,
 				DCBA4083268EED88008D2941 /* RootViewController.xib in Resources */,
 				DCBA4090268F18F5008D2941 /* CustomUIViewController.xib in Resources */,
+				AD007A2A2851D1F40087B580 /* TestBottomToolsView.xib in Resources */,
 				DCBA408A268F12E8008D2941 /* __bb_picture_browser_error__@2x.png in Resources */,
 				DCBA4095268F1901008D2941 /* AnimationViewController.xib in Resources */,
 				DCBA408B268F12E8008D2941 /* __bb_picture_browser_error__@3x.png in Resources */,
@@ -266,7 +292,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD007A232851CBE50087B580 /* CustomAutoUIViewController.m in Sources */,
 				DCC2DE03268EEB060004A262 /* BBPictureBrowser.m in Sources */,
+				AD007A282851D1EA0087B580 /* TestBottomToolsView.m in Sources */,
 				DCC7E137268D974D00CB995B /* AppDelegate.m in Sources */,
 				DCBA4082268EED88008D2941 /* RootViewController.m in Sources */,
 				DCBA4094268F1901008D2941 /* AnimationViewController.m in Sources */,

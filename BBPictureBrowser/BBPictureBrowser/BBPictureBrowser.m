@@ -406,6 +406,13 @@ static NSOperationQueue *downsampleQueue;
     }
     if (_topBar) {
         [self addSubview:_topBar];
+        _topBar.translatesAutoresizingMaskIntoConstraints = NO;
+        [[_topBar.leadingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.leadingAnchor] setActive:YES];
+        [[_topBar.trailingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.trailingAnchor] setActive:YES];
+        [[_topBar.topAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.topAnchor] setActive:YES];
+        if (_topBarHeight == UITableViewAutomaticDimension) {} else {
+            [[_topBar.heightAnchor constraintEqualToConstant:_topBarHeight] setActive:YES];
+        }
     }
     if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowserHeightForBottomBar:)]) {
         _bottomBarHeight = [_delegate bb_pictureBrowserHeightForBottomBar:self];
@@ -415,6 +422,13 @@ static NSOperationQueue *downsampleQueue;
     }
     if (_bottomBar) {
         [self addSubview:_bottomBar];
+        _bottomBar.translatesAutoresizingMaskIntoConstraints = NO;
+        [[_bottomBar.leadingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.leadingAnchor] setActive:YES];
+        [[_bottomBar.trailingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.trailingAnchor] setActive:YES];
+        [[_bottomBar.bottomAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.bottomAnchor] setActive:YES];
+        if (_bottomBarHeight == UITableViewAutomaticDimension) {} else {
+            [[_bottomBar.heightAnchor constraintEqualToConstant:_bottomBarHeight] setActive:YES];
+        }
     }
     [onView addSubview:self];
     [self layoutIfNeeded];
@@ -525,21 +539,6 @@ static NSOperationQueue *downsampleQueue;
     UICollectionViewFlowLayout *flowLayout = (UICollectionViewFlowLayout *)_collectionView.collectionViewLayout;
     flowLayout.itemSize = self.bounds.size;
     [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:_currentIndex inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:NO];
-    // tool bar
-    CGRect topFrame = CGRectMake(
-                                 self.safeAreaInsets.left,
-                                 self.safeAreaInsets.top,
-                                 self.frame.size.width - self.safeAreaInsets.left - self.safeAreaInsets.right,
-                                 _topBarHeight
-                                 );
-    _topBar.frame = topFrame;
-    CGRect bottomFrame = CGRectMake(
-                                    self.safeAreaInsets.left,
-                                    self.frame.size.height - self.safeAreaInsets.bottom - _bottomBarHeight,
-                                    self.frame.size.width - self.safeAreaInsets.left - self.safeAreaInsets.right,
-                                    _bottomBarHeight
-                                    );
-    _bottomBar.frame = bottomFrame;
 }
 
 #pragma mark - collection view
