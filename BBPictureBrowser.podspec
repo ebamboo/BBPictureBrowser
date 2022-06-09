@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
 
   spec.name         = "BBPictureBrowser"
-  spec.version      = "2.1.0"
+  spec.version      = "2.2.0"
   spec.license      = "MIT"
   spec.summary      = "一个轻量级的图片浏览器"
   spec.author       = { "ebamboo" => "1453810050@qq.com" }

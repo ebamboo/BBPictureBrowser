@@ -492,7 +492,7 @@ static NSOperationQueue *downsampleQueue;
                          animateFromView:(nullable UIView *)view {
     self = [super init];
     if (self) {
-        _pictureList = pictures;
+        _pictureList = [pictures copy];
         _delegate = delegate;
         _animateFromView = view;
     }
