@@ -113,8 +113,8 @@ BBPictureBrowser *browser = [BBPictureBrowser browserWithPictures:pictureList de
 
 @end
 ```
-# License
-BBPictureBrowser is distributed under the MIT license. See LICENSE file for details.
 # Version
 * v2.2.0 工具栏提供高度自适应功能
 * v2.0.0 本地图片压缩和网络图片压缩
+# License
+BBPictureBrowser is distributed under the MIT license. See LICENSE file for details.
