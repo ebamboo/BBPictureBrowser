@@ -82,14 +82,17 @@ BBPictureBrowser *browser = [BBPictureBrowser browserWithPictures:pictureList de
 - (nullable UIView *)bb_pictureBrowser:(nullable BBPictureBrowser *)browser animateToViewAtIndex:(NSInteger)index;
 
 /// 自定义顶部工具栏
+/// 高度返回 UITableViewAutomaticDimension 时，表示自适应高度（参考 UITableViewCell 自适应高度）
 - (CGFloat)bb_pictureBrowserHeightForTopBar:(nullable BBPictureBrowser *)browser;
 - (nullable UIView *)bb_pictureBrowserViewForTopBar:(nullable BBPictureBrowser *)browser;
 
 /// 自定义底部工具栏
+/// 高度返回 UITableViewAutomaticDimension 时，表示自适应高度（参考 UITableViewCell 自适应高度）
 - (CGFloat)bb_pictureBrowserHeightForBottomBar:(nullable BBPictureBrowser *)browser;
 - (nullable UIView *)bb_pictureBrowserViewForBottomBar:(nullable BBPictureBrowser *)browser;
 
 /// 图片浏览器展示了下标为 index 的图片
+/// 调用 -bb_openOnView:atIndex: 方法时，也会试图调用本方法
 - (void)bb_pictureBrowser:(nullable BBPictureBrowser *)browser didShowPictureAtIndex:(NSInteger)index topBar:(nullable UIView *)topBar bottomBar:(nullable UIView *)bottomBar;
 
 @end
