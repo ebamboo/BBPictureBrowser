@@ -61,26 +61,31 @@ static NSOperationQueue *downsampleQueue;
     downsampleQueue = [NSOperationQueue new];
 }
 
-// 目前有两次使用场景会试图采样获取 thumb；
+// 目前有两个场景会试图采样获取 thumb
 // 第一次：模型初始化时调用
-// 第二次：展示网络图片时，把本地缓存的图片赋值给 _localImage
-// 保证 localImage 有值时，只赋值一次；
-// 如果 localImage 为 nil 时，无限制。
+// 第二次：图片浏览器打开时，若当前展示的图片为网络图片，会把本地缓存的图片（可能为空）赋值给 _localImage
+// 注意：保证设置之前 _localImage 为空
 - (void)setLocalImage:(UIImage *)localImage {
     _localImage = localImage;
     if (localImage) {
-        __weak typeof(self) weakSelf = self;
-        NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
-            weakSelf.thumbImage = [weakSelf downsampleFor:localImage];
-        }];
-        [downsampleQueue addOperation:operation];
+        CGFloat maxImageSide = MAX(localImage.size.width, localImage.size.height) * localImage.scale;
+        CGFloat maxScreenSide = MAX(UIScreen.mainScreen.bounds.size.width, UIScreen.mainScreen.bounds.size.height) * UIScreen.mainScreen.scale;
+        if (maxImageSide > maxScreenSide) {
+            __weak typeof(self) weakSelf = self;
+            NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
+                weakSelf.thumbImage = [weakSelf downsampleFor:localImage];
+            }];
+            [downsampleQueue addOperation:operation];
+        } else {
+            _thumbImage = localImage;
+        }
     }
 }
 
 // 采样 thumb （Apple 提供的压缩算法）
 - (UIImage *)downsampleFor:(UIImage *)image {
     // 创建 CGImageSourceRef  注意：image 不能为空进而导致 imageSource 为空
-    NSData *data = UIImageJPEGRepresentation(image, 1.0);
+    NSData *data = UIImagePNGRepresentation(image);
     NSDictionary *imageSourceOptions = @{ (__bridge id)kCGImageSourceShouldCache: @NO };
     CGImageSourceRef imageSourceRef = CGImageSourceCreateWithData((__bridge CFDataRef)data, (__bridge CFDictionaryRef)imageSourceOptions);
     // 配置 downsampleOptions
@@ -108,8 +113,11 @@ static NSOperationQueue *downsampleQueue;
 @interface BBPictureBrowserCell : UICollectionViewCell <UIScrollViewDelegate, UIGestureRecognizerDelegate>
 
 @property (nonatomic, retain) BBPictureModel *picture;
-//  0 - 加载图片成功 1 - 加载图片中 2 - 加载图片失败
-@property (nonatomic, assign) NSInteger cellStatus;
+@property (nonatomic, assign) NSInteger cellStatus; //  0 - 加载图片成功；1 - 加载图片中；2 - 加载图片失败；
+
+@property (nonatomic, copy) void (^singleActionHandler)(UITapGestureRecognizer *singleTap);
+@property (nonatomic, copy) void (^panActionHandler)(UIPanGestureRecognizer *pan);
+
 
 @property (nonatomic, retain) UIScrollView *scrollView;
 @property (nonatomic, retain) UIImageView *imageView;
@@ -117,9 +125,6 @@ static NSOperationQueue *downsampleQueue;
 @property (nonatomic, retain) UIView *infoView;
 @property (nonatomic, retain) UIActivityIndicatorView *loadingView;
 @property (nonatomic, retain) UIImageView *failureView;
-
-@property (nonatomic, copy) void (^singleActionHandler)(UITapGestureRecognizer *singleTap);
-@property (nonatomic, copy) void (^panActionHandler)(UIPanGestureRecognizer *pan);
 
 @end
 
@@ -143,22 +148,24 @@ static NSOperationQueue *downsampleQueue;
         if (picture.localImage) {
             picture.thumbImage = [picture downsampleFor:picture.localImage];
             [weakSelf setCellStatus:0];
-            weakSelf.imageView.image = picture.thumbImage ?: picture.localImage;
+            weakSelf.imageView.image = picture.thumbImage;
             [weakSelf setupScrollViewContentSizeAndImageViewFrame];
             return;
         }
         if (picture.webImage) {
+            CGFloat maxScreenSide = MAX(UIScreen.mainScreen.bounds.size.width, UIScreen.mainScreen.bounds.size.height) * UIScreen.mainScreen.scale;
+            CGSize maxSize = CGSizeMake(maxScreenSide, maxScreenSide);
             [weakSelf.imageView sd_setImageWithURL:[NSURL URLWithString:picture.webImage]
                                   placeholderImage:nil
                                            options:SDWebImageAvoidAutoSetImage
-                                           context:@{SDWebImageContextStoreCacheType: @(SDImageCacheTypeNone), SDWebImageContextImageThumbnailPixelSize: @(UIScreen.mainScreen.bounds.size)}
+                                           context:@{SDWebImageContextImageThumbnailPixelSize: @(maxSize)}
                                           progress:nil
                                          completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (image) {
                         picture.thumbImage = image;
                         [weakSelf setCellStatus:0];
-                        weakSelf.imageView.image = image;
+                        weakSelf.imageView.image = picture.thumbImage;
                         [weakSelf setupScrollViewContentSizeAndImageViewFrame];
                     } else {
                         [weakSelf setCellStatus:2];
@@ -191,7 +198,6 @@ static NSOperationQueue *downsampleQueue;
             return;
         }
     }
-    
 }
 
 #pragma mark - life circle
@@ -331,30 +337,19 @@ static NSOperationQueue *downsampleQueue;
 
 // 设置 scroll view 没有进行缩放时的 content size 和 image view frame
 - (void)setupScrollViewContentSizeAndImageViewFrame {
-    CGSize size = CGSizeZero;
-    if (_imageView.image) {
+    CGSize size = _imageView.image.size;
+    if (size.width > self.bounds.size.width || size.height > self.bounds.size.height) {
         CGSize imageSize = _imageView.image.size;
-        CGRect bounds = self.bounds;
-        if (imageSize.height * bounds.size.width / imageSize.width > bounds.size.height) { // 图片高比较 "大"
-            size = CGSizeMake(imageSize.width * bounds.size.height / imageSize.height, bounds.size.height);
+        CGSize usaleSize = self.bounds.size;
+        if (imageSize.height * usaleSize.width / imageSize.width > usaleSize.height) { // 图片高比较 "大"
+            size = CGSizeMake(imageSize.width * usaleSize.height / imageSize.height, usaleSize.height);
         } else { // 图片宽比较 "大"
-            size = CGSizeMake(bounds.size.width, imageSize.height * bounds.size.width / imageSize.width);
+            size = CGSizeMake(usaleSize.width, imageSize.height * usaleSize.width / imageSize.width);
         }
     }
     _scrollView.contentSize = size;
     _imageView.bounds = CGRectMake(0, 0, size.width, size.height);
     _imageView.center = _scrollView.center;
-}
-
-// 获取 cell 所在 collection view
-- (UICollectionView *)collectionView {
-    for (UIView *view = self; view; view = view.superview) {
-        UIResponder *nextResponder = [view nextResponder];
-        if ([nextResponder isKindOfClass:[UICollectionView class]]) {
-            return (UICollectionView *)nextResponder;
-        }
-    }
-    return nil;
 }
 
 @end
@@ -672,17 +667,19 @@ static NSOperationQueue *downsampleQueue;
 
 // 显示动画结束时，动画视图的 frame
 - (CGRect)frameForShowAnimationViewAtEndWithImage:(UIImage *)image {
-    CGSize imageSize = image.size;
-    CGRect bounds = self.bounds;
-    CGSize size = CGSizeZero;
-    if (imageSize.height * bounds.size.width / imageSize.width > bounds.size.height) { // 图片高比较 "大"
-        size = CGSizeMake(imageSize.width * bounds.size.height / imageSize.height, bounds.size.height);
-    } else { // 图片宽比较 "大"
-        size = CGSizeMake(bounds.size.width, imageSize.height * bounds.size.width / imageSize.width);
+    CGSize size = image.size;
+    if (size.width > self.bounds.size.width || size.height > self.bounds.size.height) {
+        CGSize imageSize = image.size;
+        CGSize usaleSize = self.bounds.size;
+        if (imageSize.height * usaleSize.width / imageSize.width > usaleSize.height) { // 图片高比较 "大"
+            size = CGSizeMake(imageSize.width * usaleSize.height / imageSize.height, usaleSize.height);
+        } else { // 图片宽比较 "大"
+            size = CGSizeMake(usaleSize.width, imageSize.height * usaleSize.width / imageSize.width);
+        }
     }
     return CGRectMake(
-                      (bounds.size.width - size.width) / 2,
-                      (bounds.size.height - size.height) / 2,
+                      (self.bounds.size.width - size.width) / 2,
+                      (self.bounds.size.height - size.height) / 2,
                       size.width,
                       size.height
                       );

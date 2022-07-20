@@ -72,7 +72,7 @@
         // --- 本地图片
         if (indexPath.row == 0) {
             NSArray *pictureList = @[
-                [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"01"] webImage:nil],
+                [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"little"] webImage:nil],
                 [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"02"] webImage:nil],
                 [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"03"] webImage:nil],
                 [BBPictureModel modelWithLocalImage:[UIImage imageNamed:@"04"] webImage:nil],
