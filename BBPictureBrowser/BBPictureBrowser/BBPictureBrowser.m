@@ -19,8 +19,8 @@
 @property (nonatomic, retain) UIImage *localImage;
 @property (nonatomic, copy) NSString *webImage;
 
-// 成功采样获取的压缩图片
-@property (nonatomic, retain) UIImage *thumbImage;
+@property (nonatomic, retain) UIImage *localThumb;
+@property (nonatomic, retain) UIImage *webThumb;
 
 @end
 
@@ -31,8 +31,9 @@
 - (nonnull instancetype)initWithLocalImage:(nullable UIImage *)local webImage:(nullable NSString *)web {
     self = [super init];
     if (self) {
-        self.localImage = local;
+        _localImage = local;
         _webImage = web;
+        [self downsampleLocalImage];
     }
     return self;
 }
@@ -49,8 +50,12 @@
     return _webImage;
 }
 
-- (UIImage *)bb_thumb {
-    return _thumbImage;
+- (UIImage *)bb_localThumb {
+    return _localThumb;
+}
+
+- (UIImage *)bb_webThumb {
+    return _webThumb;
 }
 
 #pragma mark - private method
@@ -61,28 +66,24 @@ static NSOperationQueue *downsampleQueue;
     downsampleQueue = [NSOperationQueue new];
 }
 
-// 目前有两个场景会试图采样获取 thumb
-// 第一次：模型初始化时调用
-// 第二次：图片浏览器打开时，若当前展示的图片为网络图片，会把本地缓存的图片（可能为空）赋值给 _localImage
-// 注意：保证设置之前 _localImage 为空
-- (void)setLocalImage:(UIImage *)localImage {
-    _localImage = localImage;
-    if (localImage) {
-        CGFloat maxImageSide = MAX(localImage.size.width, localImage.size.height) * localImage.scale;
-        CGFloat maxScreenSide = MAX(UIScreen.mainScreen.bounds.size.width, UIScreen.mainScreen.bounds.size.height) * UIScreen.mainScreen.scale;
-        if (maxImageSide > maxScreenSide) {
+// 模型初始化时试图采样获取 thumb
+- (void)downsampleLocalImage {
+    if (_localImage) {
+        CGFloat maxImagePixelSide = MAX(_localImage.size.width, _localImage.size.height) * _localImage.scale;
+        CGFloat maxScreenPixelSide = MAX(UIScreen.mainScreen.bounds.size.width, UIScreen.mainScreen.bounds.size.height) * UIScreen.mainScreen.scale;
+        if (maxImagePixelSide > maxScreenPixelSide) {
             __weak typeof(self) weakSelf = self;
             NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
-                weakSelf.thumbImage = [weakSelf downsampleFor:localImage];
+                weakSelf.localThumb = [weakSelf downsampleFor:weakSelf.localImage];
             }];
             [downsampleQueue addOperation:operation];
         } else {
-            _thumbImage = localImage;
+            _localThumb = _localImage;
         }
     }
 }
 
-// 采样 thumb （Apple 提供的压缩算法）
+// 采样 thumb 过程（Apple 提供的压缩算法）
 - (UIImage *)downsampleFor:(UIImage *)image {
     // 创建 CGImageSourceRef  注意：image 不能为空进而导致 imageSource 为空
     NSData *data = UIImagePNGRepresentation(image);
@@ -114,6 +115,7 @@ static NSOperationQueue *downsampleQueue;
 
 @property (nonatomic, retain) BBPictureModel *picture;
 @property (nonatomic, assign) NSInteger cellStatus; //  0 - 加载图片成功；1 - 加载图片中；2 - 加载图片失败；
+@property (nonatomic, copy) NSValue *lastBounds; // 记录最新的 bounds，如若变化则刷新布局
 
 @property (nonatomic, copy) void (^singleActionHandler)(UITapGestureRecognizer *singleTap);
 @property (nonatomic, copy) void (^panActionHandler)(UIPanGestureRecognizer *pan);
@@ -134,65 +136,61 @@ static NSOperationQueue *downsampleQueue;
 
 - (void)setPicture:(BBPictureModel *)picture {
     _picture = picture;
-    __weak typeof(self) weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{ // 动图需要在主线程才会有效果
-        //-------
-        if (picture.thumbImage) {
-            [self setCellStatus:0];
-            weakSelf.imageView.image = picture.thumbImage;
-            [weakSelf setupScrollViewContentSizeAndImageViewFrame];
-            return;
-        }
-        // 没有“现成”的图片可供使用
-        [self setCellStatus:1];
-        if (picture.localImage) {
-            picture.thumbImage = [picture downsampleFor:picture.localImage];
-            [weakSelf setCellStatus:0];
-            weakSelf.imageView.image = picture.thumbImage;
-            [weakSelf setupScrollViewContentSizeAndImageViewFrame];
-            return;
-        }
-        if (picture.webImage) {
-            CGFloat maxScreenSide = MAX(UIScreen.mainScreen.bounds.size.width, UIScreen.mainScreen.bounds.size.height) * UIScreen.mainScreen.scale;
-            CGSize maxSize = CGSizeMake(maxScreenSide, maxScreenSide);
-            [weakSelf.imageView sd_setImageWithURL:[NSURL URLWithString:picture.webImage]
-                                  placeholderImage:nil
-                                           options:SDWebImageAvoidAutoSetImage
-                                           context:@{SDWebImageContextImageThumbnailPixelSize: @(maxSize)}
-                                          progress:nil
-                                         completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (image) {
-                        picture.thumbImage = image;
-                        [weakSelf setCellStatus:0];
-                        weakSelf.imageView.image = picture.thumbImage;
-                        [weakSelf setupScrollViewContentSizeAndImageViewFrame];
-                    } else {
-                        [weakSelf setCellStatus:2];
-                    }
-                });
-            }];
-            return;
-        }
-        //-------
-    });
+    //  0 - 加载图片成功；1 - 加载图片中；2 - 加载图片失败；
+    [self setCellStatus:1];
+    
+    if (picture.localThumb) {
+        [self setCellStatus:0];
+        _imageView.image = picture.localThumb;
+        [self resetScrollView];
+        return;
+    }
+    
+    if (picture.localImage) {
+        picture.localThumb = [picture downsampleFor:picture.localImage];
+        [self setCellStatus:0];
+        _imageView.image = picture.localThumb;
+        [self resetScrollView];
+        return;
+    }
+    
+    if (picture.webImage) {
+        CGFloat maxScreenPixelSide = MAX(UIScreen.mainScreen.bounds.size.width, UIScreen.mainScreen.bounds.size.height) * UIScreen.mainScreen.scale;
+        CGSize maxPixelSize = CGSizeMake(maxScreenPixelSide, maxScreenPixelSide);
+        __weak typeof(self) weakSelf = self;
+        [_imageView sd_setImageWithURL:[NSURL URLWithString:picture.webImage]
+                      placeholderImage:nil
+                               options:SDWebImageAvoidAutoSetImage
+                               context:@{SDWebImageContextImageThumbnailPixelSize: @(maxPixelSize)}
+                              progress:nil
+                             completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+            if (image) {
+                picture.webThumb = image;
+                [weakSelf setCellStatus:0];
+                weakSelf.imageView.image = image;
+                [weakSelf resetScrollView];
+            } else {
+                [weakSelf setCellStatus:2];
+            }
+        }];
+        return;
+    }
 }
 
 - (void)setCellStatus:(NSInteger)cellStatus {
     _cellStatus = cellStatus;
+    //  0 - 加载图片成功；1 - 加载图片中；2 - 加载图片失败；
     if (cellStatus == 0) {
         _infoView.hidden = YES;
         return;
     } else {
         _infoView.hidden = NO;
         if (cellStatus == 1) {
-            _loadingView.hidden = NO;
             [_loadingView startAnimating];
             _failureView.hidden = YES;
             return;
         }
         if (cellStatus == 2) {
-            _loadingView.hidden = YES;
             [_loadingView stopAnimating];
             _failureView.hidden = NO;
             return;
@@ -235,6 +233,7 @@ static NSOperationQueue *downsampleQueue;
         } else {
             _loadingView.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
         }
+        _loadingView.hidesWhenStopped = YES;
         _loadingView.color = [UIColor whiteColor];
         [_infoView addSubview:_loadingView];
         
@@ -269,20 +268,17 @@ static NSOperationQueue *downsampleQueue;
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    // scroll view
-    [_scrollView setZoomScale:_scrollView.minimumZoomScale animated:NO];
-    _scrollView.frame = self.bounds;
-    [self setupScrollViewContentSizeAndImageViewFrame];
-    // info view
-    _infoView.frame = self.bounds;
-    _loadingView.center = _infoView.center;
-    _failureView.center = _infoView.center;
-}
-
-- (void)prepareForReuse {
-    [super prepareForReuse];
-    [_scrollView setZoomScale:_scrollView.minimumZoomScale animated:NO];
-    [_loadingView stopAnimating];
+    if (![_lastBounds isEqualToValue:@(self.bounds)]) {
+        // record bounds
+        _lastBounds = @(self.bounds);
+        // setup scroll view
+        _scrollView.frame = self.bounds;
+        [self resetScrollView];
+        // setup info view
+        _infoView.frame = self.bounds;
+        _loadingView.center = _infoView.center;
+        _failureView.center = _infoView.center;
+    }
 }
 
 #pragma mark - 手势事件
@@ -335,8 +331,10 @@ static NSOperationQueue *downsampleQueue;
 
 #pragma mark - private method
 
-// 设置 scroll view 没有进行缩放时的 content size 和 image view frame
-- (void)setupScrollViewContentSizeAndImageViewFrame {
+// 使 scroll view 恢复初始状态并设置该状态下
+// scroll view 的 content size 和 image view 的 frame
+- (void)resetScrollView {
+    [_scrollView setZoomScale:_scrollView.minimumZoomScale animated:NO];
     CGSize size = _imageView.image.size;
     if (size.width > self.bounds.size.width || size.height > self.bounds.size.height) {
         CGSize imageSize = _imageView.image.size;
@@ -428,24 +426,24 @@ static NSOperationQueue *downsampleQueue;
     [onView addSubview:self];
     [self layoutIfNeeded];
     // 显示动画
-    BBPictureModel *picture = _pictureList[_currentIndex];
-    if (!picture.localImage) {
-        picture.localImage = [SDImageCache.sharedImageCache imageFromCacheForKey:picture.webImage];
+    UIImage *animateImage = _pictureList[_currentIndex].localImage;
+    if (!animateImage) {
+        animateImage = [SDImageCache.sharedImageCache imageFromCacheForKey:_pictureList[_currentIndex].webImage];
     }
     self.backgroundColor = [BBPictureBrowserBackgroundColor colorWithAlphaComponent:0.0];
     _collectionView.hidden = YES;
     _topBar.hidden = YES;
     _bottomBar.hidden = YES;
-    if (_animateFromView && picture.localImage) {
+    if (_animateFromView && animateImage) {
         UIImageView *animationView = [[UIImageView alloc] init];
         animationView.clipsToBounds = YES;
         animationView.contentMode = UIViewContentModeScaleAspectFill;
         animationView.frame = [_animateFromView convertRect:_animateFromView.bounds toView:self];
-        animationView.image = picture.localImage;
+        animationView.image = animateImage;
         [self addSubview:animationView];
         __weak typeof(self) weakSelf = self;
         [UIView animateWithDuration:0.3 animations:^{
-            animationView.frame = [weakSelf frameForShowAnimationViewAtEndWithImage:picture.localImage];
+            animationView.frame = [weakSelf frameForShowAnimationViewAtEndWithImage:animateImage];
             self.backgroundColor = [BBPictureBrowserBackgroundColor colorWithAlphaComponent:1.0];
         } completion:^(BOOL finished) {
             weakSelf.collectionView.hidden = NO;

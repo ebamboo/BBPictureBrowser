@@ -21,7 +21,8 @@
 /// 只有在成功获取到压缩图片之后，才会真正展示图片
 /// 本地图片使用 Apple 提供的压缩算法获取压缩图片
 /// 网络图片使用 SDWebImage 提供的压缩算法获取压缩图片
-@property (nullable, nonatomic, readonly) UIImage *bb_thumb;
+@property (nullable, nonatomic, readonly) UIImage *bb_localThumb;
+@property (nullable, nonatomic, readonly) UIImage *bb_webThumb;
 
 @end
 
