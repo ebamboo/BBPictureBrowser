@@ -11,6 +11,18 @@
 #define     BBPictureBrowserBackgroundColor         [UIColor blackColor]
 #define     BBPictureBrowserFailureImageName        @"__bb_picture_browser_error__"
 
+static CGRect frameForSizeInSize(CGSize forSize, CGSize inSize) {
+    CGSize size = forSize;
+    if (forSize.width > inSize.width || forSize.height > inSize.height) {
+        if (forSize.height * inSize.width / forSize.width > inSize.height) { // 图片高比较 "大"
+            size = CGSizeMake(forSize.width * inSize.height / forSize.height, inSize.height);
+        } else { // 图片宽比较 "大"
+            size = CGSizeMake(inSize.width, forSize.height * inSize.width / forSize.width);
+        }
+    }
+    return CGRectMake((inSize.width - size.width)/2, (inSize.height - size.height)/2, size.width, size.height);
+}
+
 #pragma mark - =======================================
 #pragma mark -
 
@@ -28,6 +40,10 @@
 
 #pragma mark - public method
 
++ (nonnull instancetype)modelWithLocalImage:(nullable UIImage *)local webImage:(nullable NSString *)web {
+    return [[BBPictureModel alloc] initWithLocalImage:local webImage:web];
+}
+
 - (nonnull instancetype)initWithLocalImage:(nullable UIImage *)local webImage:(nullable NSString *)web {
     self = [super init];
     if (self) {
@@ -36,10 +52,6 @@
         [self downsampleLocalImage];
     }
     return self;
-}
-
-+ (nonnull instancetype)modelWithLocalImage:(nullable UIImage *)local webImage:(nullable NSString *)web {
-    return [[BBPictureModel alloc] initWithLocalImage:local webImage:web];
 }
 
 - (UIImage *)bb_local {
@@ -353,18 +365,20 @@ static NSOperationQueue *downsampleQueue;
 
 @interface BBPictureBrowser () <UICollectionViewDataSource, UICollectionViewDelegate>
 
-// store property
+#pragma mark - data
+
 @property (nonatomic, retain) NSArray <BBPictureModel *> *pictureList;
 @property (nonatomic, weak) id <BBPictureBrowserDelegate> delegate;
 @property (nonatomic, weak) UIView *animateFromView;
 @property (nonatomic, assign) NSInteger currentIndex;
 
-// UICollectionView
+#pragma mark - ui
+
 @property (nonatomic, retain) UICollectionView *collectionView;
 
-// 工具栏，由开发者通过协议提供
 @property (nonatomic, assign) CGFloat topBarHeight;
 @property (nonatomic, retain) UIView *topBar;
+
 @property (nonatomic, assign) CGFloat bottomBarHeight;
 @property (nonatomic, retain) UIView *bottomBar;
 
@@ -375,61 +389,25 @@ static NSOperationQueue *downsampleQueue;
 #pragma mark - public method
 
 - (void)bb_openOnView:(nonnull UIView *)onView atIndex:(NSInteger)index {
-    // 数据安全检查配置
-    if (_pictureList.count == 0) {
-        return;
-    }
+    if (_pictureList.count == 0) return;
+    if (index < 0 || _pictureList.count <= index) return;
+    
+    // 1. 加入 super view
+    self.frame = onView.bounds;
     _currentIndex = index;
-    if (index < 0) {
-        _currentIndex = 0;
-    }
-    if (index > _pictureList.count - 1) {
-        _currentIndex = _pictureList.count - 1;
-    }
-    // 添加 UI 并刷新布局
-    if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowserHeightForTopBar:)]) {
-        _topBarHeight = [_delegate bb_pictureBrowserHeightForTopBar:self];
-    }
-    if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowserViewForTopBar:)]) {
-        _topBar = [_delegate bb_pictureBrowserViewForTopBar:self];
-    }
-    if (_topBar) {
-        [self addSubview:_topBar];
-        _topBar.translatesAutoresizingMaskIntoConstraints = NO;
-        [[_topBar.leadingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.leadingAnchor] setActive:YES];
-        [[_topBar.trailingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.trailingAnchor] setActive:YES];
-        [[_topBar.topAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.topAnchor] setActive:YES];
-        if (_topBarHeight == UITableViewAutomaticDimension) {} else {
-            [[_topBar.heightAnchor constraintEqualToConstant:_topBarHeight] setActive:YES];
-        }
-    }
-    if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowserHeightForBottomBar:)]) {
-        _bottomBarHeight = [_delegate bb_pictureBrowserHeightForBottomBar:self];
-    }
-    if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowserViewForBottomBar:)]) {
-        _bottomBar = [_delegate bb_pictureBrowserViewForBottomBar:self];
-    }
-    if (_bottomBar) {
-        [self addSubview:_bottomBar];
-        _bottomBar.translatesAutoresizingMaskIntoConstraints = NO;
-        [[_bottomBar.leadingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.leadingAnchor] setActive:YES];
-        [[_bottomBar.trailingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.trailingAnchor] setActive:YES];
-        [[_bottomBar.bottomAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.bottomAnchor] setActive:YES];
-        if (_bottomBarHeight == UITableViewAutomaticDimension) {} else {
-            [[_bottomBar.heightAnchor constraintEqualToConstant:_bottomBarHeight] setActive:YES];
-        }
-    }
     [onView addSubview:self];
-    [self layoutIfNeeded];
-    // 显示动画
-    UIImage *animateImage = _pictureList[_currentIndex].localImage;
-    if (!animateImage) {
-        animateImage = [SDImageCache.sharedImageCache imageFromCacheForKey:_pictureList[_currentIndex].webImage];
-    }
+    
+    // 2. 隐藏视图
     self.backgroundColor = [BBPictureBrowserBackgroundColor colorWithAlphaComponent:0.0];
     _collectionView.hidden = YES;
     _topBar.hidden = YES;
     _bottomBar.hidden = YES;
+    
+    // 3. 显示视图
+    UIImage *animateImage = _pictureList[_currentIndex].localImage;
+    if (!animateImage) {
+        animateImage = [SDImageCache.sharedImageCache imageFromCacheForKey:_pictureList[_currentIndex].webImage];
+    }
     if (_animateFromView && animateImage) {
         UIImageView *animationView = [[UIImageView alloc] init];
         animationView.clipsToBounds = YES;
@@ -439,7 +417,7 @@ static NSOperationQueue *downsampleQueue;
         [self addSubview:animationView];
         __weak typeof(self) weakSelf = self;
         [UIView animateWithDuration:0.3 animations:^{
-            animationView.frame = [weakSelf frameForShowAnimationViewAtEndWithImage:animateImage];
+            animationView.frame = frameForSizeInSize(animateImage.size, weakSelf.bounds.size);
             self.backgroundColor = [BBPictureBrowserBackgroundColor colorWithAlphaComponent:1.0];
         } completion:^(BOOL finished) {
             weakSelf.collectionView.hidden = NO;
@@ -453,7 +431,8 @@ static NSOperationQueue *downsampleQueue;
         _topBar.hidden = NO;
         _bottomBar.hidden = NO;
     }
-    // 展示了下标为 index 的图片回调
+    
+    // 4. 展示下标为 index 的图片时进行回调
     if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowser:didShowPictureAtIndex:topBar:bottomBar:)]) {
         [_delegate bb_pictureBrowser:self didShowPictureAtIndex:_currentIndex topBar:_topBar bottomBar:_bottomBar];
     }
@@ -476,27 +455,26 @@ static NSOperationQueue *downsampleQueue;
 
 #pragma mark - life circle
 
-- (nonnull instancetype)initWithPictures:(nonnull NSArray<BBPictureModel *> *)pictures
-                                delegate:(nullable id<BBPictureBrowserDelegate>)delegate
-                         animateFromView:(nullable UIView *)view {
-    self = [super init];
-    if (self) {
-        _pictureList = [pictures copy];
-        _delegate = delegate;
-        _animateFromView = view;
-    }
-    return self;
-}
-
 + (nonnull instancetype)browserWithPictures:(nonnull NSArray<BBPictureModel *> *)pictures
                                    delegate:(nullable id<BBPictureBrowserDelegate>)delegate
                             animateFromView:(nullable UIView *)view {
     return [[BBPictureBrowser alloc] initWithPictures:pictures delegate:delegate animateFromView:view];
 }
 
-- (instancetype)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
+- (nonnull instancetype)initWithPictures:(nonnull NSArray<BBPictureModel *> *)pictures
+                                delegate:(nullable id<BBPictureBrowserDelegate>)delegate
+                         animateFromView:(nullable UIView *)view {
+    self = [super initWithFrame:CGRectZero];
     if (self) {
+        // =================== 数据初始 ======================
+        
+        _pictureList = [pictures copy];
+        _delegate = delegate;
+        _animateFromView = view;
+        _currentIndex = 0;
+        
+        // =================== 图片视图 ======================
+        
         UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
         flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
         flowLayout.sectionInset = UIEdgeInsetsMake(0, 0, 0, 10);
@@ -512,7 +490,45 @@ static NSOperationQueue *downsampleQueue;
         _collectionView.showsVerticalScrollIndicator = NO;
         _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
         [_collectionView registerClass:[BBPictureBrowserCell class] forCellWithReuseIdentifier:@"BBPictureBrowserCell"];
-        [self insertSubview:_collectionView atIndex:0];
+        [self addSubview:_collectionView];
+        
+        // =================== 顶部视图 ======================
+        
+        if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowserHeightForTopBar:)]) {
+            _topBarHeight = [_delegate bb_pictureBrowserHeightForTopBar:self];
+        }
+        if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowserViewForTopBar:)]) {
+            _topBar = [_delegate bb_pictureBrowserViewForTopBar:self];
+        }
+        if (_topBar) {
+            [self addSubview:_topBar];
+            _topBar.translatesAutoresizingMaskIntoConstraints = NO;
+            [[_topBar.leadingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.leadingAnchor] setActive:YES];
+            [[_topBar.trailingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.trailingAnchor] setActive:YES];
+            [[_topBar.topAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.topAnchor] setActive:YES];
+            if (_topBarHeight == UITableViewAutomaticDimension) {} else {
+                [[_topBar.heightAnchor constraintEqualToConstant:_topBarHeight] setActive:YES];
+            }
+        }
+        
+        // =================== 底部视图 ======================
+        
+        if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowserHeightForBottomBar:)]) {
+            _bottomBarHeight = [_delegate bb_pictureBrowserHeightForBottomBar:self];
+        }
+        if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowserViewForBottomBar:)]) {
+            _bottomBar = [_delegate bb_pictureBrowserViewForBottomBar:self];
+        }
+        if (_bottomBar) {
+            [self addSubview:_bottomBar];
+            _bottomBar.translatesAutoresizingMaskIntoConstraints = NO;
+            [[_bottomBar.leadingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.leadingAnchor] setActive:YES];
+            [[_bottomBar.trailingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.trailingAnchor] setActive:YES];
+            [[_bottomBar.bottomAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.bottomAnchor] setActive:YES];
+            if (_bottomBarHeight == UITableViewAutomaticDimension) {} else {
+                [[_bottomBar.heightAnchor constraintEqualToConstant:_bottomBarHeight] setActive:YES];
+            }
+        }
     }
     return self;
 }
@@ -530,11 +546,7 @@ static NSOperationQueue *downsampleQueue;
     [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:_currentIndex inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:NO];
 }
 
-#pragma mark - collection view
-
-- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
-    return 1;
-}
+#pragma mark - UICollectionViewDataSource
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     return _pictureList.count;
@@ -637,7 +649,7 @@ static NSOperationQueue *downsampleQueue;
     return cell;
 }
 
-#pragma mark - scroll view
+#pragma mark - UIScrollViewDelegate
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
     if (!decelerate) {
@@ -655,28 +667,6 @@ static NSOperationQueue *downsampleQueue;
     if (_delegate && [_delegate respondsToSelector:@selector(bb_pictureBrowser:didShowPictureAtIndex:topBar:bottomBar:)]) {
         [_delegate bb_pictureBrowser:self didShowPictureAtIndex:_currentIndex topBar:_topBar bottomBar:_bottomBar];
     }
-}
-
-#pragma mark - private method
-
-// 显示动画结束时，动画视图的 frame
-- (CGRect)frameForShowAnimationViewAtEndWithImage:(UIImage *)image {
-    CGSize size = image.size;
-    if (size.width > self.bounds.size.width || size.height > self.bounds.size.height) {
-        CGSize imageSize = image.size;
-        CGSize usaleSize = self.bounds.size;
-        if (imageSize.height * usaleSize.width / imageSize.width > usaleSize.height) { // 图片高比较 "大"
-            size = CGSizeMake(imageSize.width * usaleSize.height / imageSize.height, usaleSize.height);
-        } else { // 图片宽比较 "大"
-            size = CGSizeMake(usaleSize.width, imageSize.height * usaleSize.width / imageSize.width);
-        }
-    }
-    return CGRectMake(
-                      (self.bounds.size.width - size.width) / 2,
-                      (self.bounds.size.height - size.height) / 2,
-                      size.width,
-                      size.height
-                      );
 }
 
 @end

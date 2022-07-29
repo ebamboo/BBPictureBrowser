@@ -15,8 +15,8 @@
 /// 网络图片使用 SDWebImage 提供的压缩算法获取压缩图片
 @interface BBPictureModel : NSObject
 
-- (nonnull instancetype)initWithLocalImage:(nullable UIImage *)local webImage:(nullable NSString *)web;
 + (nonnull instancetype)modelWithLocalImage:(nullable UIImage *)local webImage:(nullable NSString *)web;
+- (nonnull instancetype)initWithLocalImage:(nullable UIImage *)local webImage:(nullable NSString *)web;
 
 @property (nullable, nonatomic, readonly) UIImage *bb_local;
 @property (nullable, nonatomic, readonly) NSString *bb_web;
@@ -59,8 +59,8 @@
 /// @param pictures 要展示的图片
 /// @param delegate 设置代理可以监听和响应事件、实现自定义 UI 和关闭动画
 /// @param view 图片浏览器打开时动画开始位置视图，若为 nil 则没有打开动画
-- (nonnull instancetype)initWithPictures:(nonnull NSArray<BBPictureModel *> *)pictures delegate:(nullable id<BBPictureBrowserDelegate>)delegate animateFromView:(nullable UIView *)view;
 + (nonnull instancetype)browserWithPictures:(nonnull NSArray<BBPictureModel *> *)pictures delegate:(nullable id<BBPictureBrowserDelegate>)delegate animateFromView:(nullable UIView *)view;
+- (nonnull instancetype)initWithPictures:(nonnull NSArray<BBPictureModel *> *)pictures delegate:(nullable id<BBPictureBrowserDelegate>)delegate animateFromView:(nullable UIView *)view;
 
 - (void)bb_openOnView:(nonnull UIView *)onView atIndex:(NSInteger)index;
 - (void)bb_close;
