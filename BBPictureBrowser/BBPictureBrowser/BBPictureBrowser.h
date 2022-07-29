@@ -9,6 +9,10 @@
 
 #import <UIKit/UIKit.h>
 
+/// 本地图片和网络图片都会试图获取一个压缩图片进行展示
+/// 只有在成功获取到压缩图片之后，才会真正展示图片
+/// 本地图片使用 Apple 提供的压缩算法获取压缩图片
+/// 网络图片使用 SDWebImage 提供的压缩算法获取压缩图片
 @interface BBPictureModel : NSObject
 
 - (nonnull instancetype)initWithLocalImage:(nullable UIImage *)local webImage:(nullable NSString *)web;
@@ -17,10 +21,6 @@
 @property (nullable, nonatomic, readonly) UIImage *bb_local;
 @property (nullable, nonatomic, readonly) NSString *bb_web;
 
-/// 本地图片和网络图片都会试图获取一个压缩图片进行展示
-/// 只有在成功获取到压缩图片之后，才会真正展示图片
-/// 本地图片使用 Apple 提供的压缩算法获取压缩图片
-/// 网络图片使用 SDWebImage 提供的压缩算法获取压缩图片
 @property (nullable, nonatomic, readonly) UIImage *bb_localThumb;
 @property (nullable, nonatomic, readonly) UIImage *bb_webThumb;
 
@@ -45,7 +45,7 @@
 - (nullable UIView *)bb_pictureBrowserViewForBottomBar:(nullable BBPictureBrowser *)browser;
 
 /// 图片浏览器展示了下标为 index 的图片
-/// 调用 -bb_openOnView:atIndex: 方法时，也会试图调用本方法
+/// 调用 -bb_openOnView:atIndex: 方法时，也会调用本方法
 - (void)bb_pictureBrowser:(nullable BBPictureBrowser *)browser didShowPictureAtIndex:(NSInteger)index topBar:(nullable UIView *)topBar bottomBar:(nullable UIView *)bottomBar;
 
 @end

@@ -73,10 +73,9 @@ static NSOperationQueue *downsampleQueue;
         CGFloat maxScreenPixelSide = MAX(UIScreen.mainScreen.bounds.size.width, UIScreen.mainScreen.bounds.size.height) * UIScreen.mainScreen.scale;
         if (maxImagePixelSide > maxScreenPixelSide) {
             __weak typeof(self) weakSelf = self;
-            NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
+            [downsampleQueue addOperationWithBlock:^{
                 weakSelf.localThumb = [weakSelf downsampleFor:weakSelf.localImage];
             }];
-            [downsampleQueue addOperation:operation];
         } else {
             _localThumb = _localImage;
         }
@@ -120,11 +119,9 @@ static NSOperationQueue *downsampleQueue;
 @property (nonatomic, copy) void (^singleActionHandler)(UITapGestureRecognizer *singleTap);
 @property (nonatomic, copy) void (^panActionHandler)(UIPanGestureRecognizer *pan);
 
-
 @property (nonatomic, retain) UIScrollView *scrollView;
 @property (nonatomic, retain) UIImageView *imageView;
 
-@property (nonatomic, retain) UIView *infoView;
 @property (nonatomic, retain) UIActivityIndicatorView *loadingView;
 @property (nonatomic, retain) UIImageView *failureView;
 
@@ -132,7 +129,7 @@ static NSOperationQueue *downsampleQueue;
 
 @implementation BBPictureBrowserCell
 
-#pragma mark - public method
+#pragma mark - data
 
 - (void)setPicture:(BBPictureModel *)picture {
     _picture = picture;
@@ -178,23 +175,28 @@ static NSOperationQueue *downsampleQueue;
 }
 
 - (void)setCellStatus:(NSInteger)cellStatus {
-    _cellStatus = cellStatus;
     //  0 - 加载图片成功；1 - 加载图片中；2 - 加载图片失败；
+    _cellStatus = cellStatus;
+    
     if (cellStatus == 0) {
-        _infoView.hidden = YES;
+        _scrollView.hidden = NO;
+        _failureView.hidden = YES;
+        [_loadingView stopAnimating];
         return;
-    } else {
-        _infoView.hidden = NO;
-        if (cellStatus == 1) {
-            [_loadingView startAnimating];
-            _failureView.hidden = YES;
-            return;
-        }
-        if (cellStatus == 2) {
-            [_loadingView stopAnimating];
-            _failureView.hidden = NO;
-            return;
-        }
+    }
+    
+    if (cellStatus == 1) {
+        _scrollView.hidden = YES;
+        _failureView.hidden = YES;
+        [_loadingView startAnimating];
+        return;
+    }
+    
+    if (cellStatus == 2) {
+        _scrollView.hidden = YES;
+        _failureView.hidden = NO;
+        [_loadingView stopAnimating];
+        return;
     }
 }
 
@@ -220,11 +222,16 @@ static NSOperationQueue *downsampleQueue;
         _imageView.userInteractionEnabled = YES;
         [_scrollView addSubview:_imageView];
         
-        // =================== 提示信息 ======================
+        // =================== 失败信息 ======================
         
-        _infoView = [[UIView alloc] init];
-        _infoView.backgroundColor = BBPictureBrowserBackgroundColor;
-        [self.contentView addSubview:_infoView];
+        _failureView = [[UIImageView alloc] init];
+        _failureView.contentMode = UIViewContentModeScaleAspectFit;
+        _failureView.tintColor = [UIColor whiteColor];
+        _failureView.bounds = CGRectMake(0, 0, 37, 37);
+        _failureView.image = [[UIImage imageNamed:BBPictureBrowserFailureImageName] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+        [self.contentView addSubview:_failureView];
+        
+        // =================== 加载信息 ======================
         
         _loadingView = [[UIActivityIndicatorView alloc] init];
         _loadingView.frame = CGRectMake(0, 0, 60, 60);
@@ -235,14 +242,7 @@ static NSOperationQueue *downsampleQueue;
         }
         _loadingView.hidesWhenStopped = YES;
         _loadingView.color = [UIColor whiteColor];
-        [_infoView addSubview:_loadingView];
-        
-        _failureView = [[UIImageView alloc] init];
-        _failureView.contentMode = UIViewContentModeScaleAspectFit;
-        _failureView.tintColor = [UIColor whiteColor];
-        _failureView.bounds = CGRectMake(0, 0, 37, 37);
-        _failureView.image = [[UIImage imageNamed:BBPictureBrowserFailureImageName] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-        [_infoView addSubview:_failureView];
+        [self.contentView addSubview:_loadingView];
         
         // =================== 添加手势 ======================
         
@@ -271,14 +271,31 @@ static NSOperationQueue *downsampleQueue;
     if (![_lastBounds isEqualToValue:@(self.bounds)]) {
         // record bounds
         _lastBounds = @(self.bounds);
-        // setup scroll view
+        // setup ui
         _scrollView.frame = self.bounds;
         [self resetScrollView];
-        // setup info view
-        _infoView.frame = self.bounds;
-        _loadingView.center = _infoView.center;
-        _failureView.center = _infoView.center;
+        _failureView.center = CGPointMake(self.bounds.size.width/2, self.bounds.size.height/2);
+        _loadingView.center = CGPointMake(self.bounds.size.width/2, self.bounds.size.height/2);
     }
+}
+
+// 使 scroll view 恢复初始状态并设置该状态下
+// scroll view 的 content size 和 image view 的 frame
+- (void)resetScrollView {
+    [_scrollView setZoomScale:_scrollView.minimumZoomScale animated:NO];
+    CGSize size = _imageView.image.size;
+    if (size.width > _scrollView.bounds.size.width || size.height > _scrollView.bounds.size.height) {
+        CGSize imageSize = _imageView.image.size;
+        CGSize usaleSize = _scrollView.bounds.size;
+        if (imageSize.height * usaleSize.width / imageSize.width > usaleSize.height) { // 图片高比较 "大"
+            size = CGSizeMake(imageSize.width * usaleSize.height / imageSize.height, usaleSize.height);
+        } else { // 图片宽比较 "大"
+            size = CGSizeMake(usaleSize.width, imageSize.height * usaleSize.width / imageSize.width);
+        }
+    }
+    _scrollView.contentSize = size;
+    _imageView.bounds = CGRectMake(0, 0, size.width, size.height);
+    _imageView.center = CGPointMake(_scrollView.bounds.size.width/2, _scrollView.bounds.size.height/2);
 }
 
 #pragma mark - 手势事件
@@ -315,7 +332,7 @@ static NSOperationQueue *downsampleQueue;
     return YES;
 }
 
-#pragma mark - scrollView
+#pragma mark - UIScrollViewDelegate
 
 - (nullable UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
     return _imageView;
@@ -324,30 +341,9 @@ static NSOperationQueue *downsampleQueue;
 - (void)scrollViewDidZoom:(UIScrollView *)scrollView {
     // 设置 image view 位置
     // 当内容大于 bounds 时，居于内容中心，当内容小于 bounds 时，居于 bounds 中心
-    CGFloat centerX = (scrollView.bounds.size.width > scrollView.contentSize.width) ? scrollView.bounds.size.width / 2 : scrollView.contentSize.width / 2;
-    CGFloat centerY = (scrollView.bounds.size.height > scrollView.contentSize.height) ? scrollView.bounds.size.height / 2 : scrollView.contentSize.height / 2;
+    CGFloat centerX = MAX(scrollView.bounds.size.width, scrollView.contentSize.width) / 2;
+    CGFloat centerY = MAX(scrollView.bounds.size.height, scrollView.contentSize.height) / 2;
     _imageView.center = CGPointMake(centerX, centerY);
-}
-
-#pragma mark - private method
-
-// 使 scroll view 恢复初始状态并设置该状态下
-// scroll view 的 content size 和 image view 的 frame
-- (void)resetScrollView {
-    [_scrollView setZoomScale:_scrollView.minimumZoomScale animated:NO];
-    CGSize size = _imageView.image.size;
-    if (size.width > self.bounds.size.width || size.height > self.bounds.size.height) {
-        CGSize imageSize = _imageView.image.size;
-        CGSize usaleSize = self.bounds.size;
-        if (imageSize.height * usaleSize.width / imageSize.width > usaleSize.height) { // 图片高比较 "大"
-            size = CGSizeMake(imageSize.width * usaleSize.height / imageSize.height, usaleSize.height);
-        } else { // 图片宽比较 "大"
-            size = CGSizeMake(usaleSize.width, imageSize.height * usaleSize.width / imageSize.width);
-        }
-    }
-    _scrollView.contentSize = size;
-    _imageView.bounds = CGRectMake(0, 0, size.width, size.height);
-    _imageView.center = _scrollView.center;
 }
 
 @end
